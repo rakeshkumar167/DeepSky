@@ -4,7 +4,7 @@ import SwiftUI
 struct DeepSkyApp: App {
     var body: some Scene {
         WindowGroup {
-            ProbeView()
+            RootView()
         }
     }
 }

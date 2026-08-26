@@ -40,3 +40,4 @@ Sessions/
 # Probe output landing in the working tree. Real device profiles are committed
 # deliberately under Tests/DeepSkyCoreTests/Fixtures/, not picked up from here.
 /capabilities-*.json
+icon.png
