@@ -48,3 +48,43 @@ private let plan60 = CapturePlan(sensorExposure: ShutterSpeed(seconds: 1.0),
                                  bytesPerFrame: 25 * mb, framesRemaining: 60)
     #expect(d == .stop(reason: "Device temperature critical"))
 }
+
+@Test func storageRequirementWithMaxFrameCountDoesNotCrash() {
+    // Int.max frameCount must not trap when converting to Int64.
+    let planMax = CapturePlan(sensorExposure: ShutterSpeed(seconds: 1.0),
+                              intervalSeconds: 0.05, frameCount: Int.max)
+    let result = CapturePolicy.storageRequirement(plan: planMax, bytesPerFrame: 25 * mb)
+    // Result should clamp and be a valid Int64
+    #expect(result > 0)
+    #expect(result <= Int64.max)
+}
+
+@Test func decideWithOverflowingFramesDoesNotCrash() {
+    // Int.max framesRemaining × bytesPerFrame must not trap when converting to Int64.
+    let result = CapturePolicy.decide(thermal: .nominal,
+                                      freeBytes: Int64.max,
+                                      bytesPerFrame: 25 * mb,
+                                      framesRemaining: Int.max)
+    // Result should be a valid decision, not a crash
+    #expect(result == .proceed)
+}
+
+@Test func storageRequirementAndDecideBoundaryAgree() {
+    // storageRequirement and decide must use the same calculation.
+    // When framesRemaining == plan.frameCount, the requirement should match.
+    let required = CapturePolicy.storageRequirement(plan: plan60, bytesPerFrame: 25 * mb)
+
+    // At exactly the boundary (freeBytes == required), should proceed
+    let atBoundary = CapturePolicy.decide(thermal: .nominal,
+                                          freeBytes: required,
+                                          bytesPerFrame: 25 * mb,
+                                          framesRemaining: 60)
+    #expect(atBoundary == .proceed)
+
+    // One byte below should stop
+    let belowBoundary = CapturePolicy.decide(thermal: .nominal,
+                                             freeBytes: required - 1,
+                                             bytesPerFrame: 25 * mb,
+                                             framesRemaining: 60)
+    #expect(belowBoundary == .stop(reason: "Insufficient storage"))
+}
