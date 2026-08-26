@@ -46,3 +46,11 @@ private func format(min: Double, max: Double) -> FormatCapability {
     #expect(ladder.count == 1)
     #expect(ladder[0].seconds == 0.5)
 }
+
+@Test func handlesInvertedRangeWithoutViolatingSpec() {
+    // When min > max (inverted), return the smaller value to honor spec §27:
+    // never imply longer exposure than hardware permits.
+    let ladder = ShutterLadder.ladder(for: format(min: 1.0, max: 0.25))
+    #expect(ladder.count == 1)
+    #expect(ladder[0].seconds <= 0.25)
+}

@@ -13,7 +13,7 @@ public enum ShutterLadder {
     public static func ladder(for format: FormatCapability) -> [ShutterSpeed] {
         let lo = format.minExposureSeconds
         let hi = format.maxExposureSeconds
-        guard hi > lo else { return [ShutterSpeed(seconds: lo)] }
+        guard hi > lo else { return [ShutterSpeed(seconds: Swift.min(lo, hi))] }
 
         var values = canonicalSeconds.filter { $0 > lo && $0 < hi }
         values.append(lo)
