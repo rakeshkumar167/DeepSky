@@ -11,6 +11,7 @@ let package = Package(
         .library(name: "DeepSkySession", targets: ["DeepSkySession"]),
         .library(name: "DeepSkySynthetic", targets: ["DeepSkySynthetic"]),
         .library(name: "DeepSkyAVCapture", targets: ["DeepSkyAVCapture"]),
+        .library(name: "DeepSkyProcessing", targets: ["DeepSkyProcessing"]),
     ],
     targets: [
         .target(name: "DeepSkyCore"),
@@ -19,6 +20,11 @@ let package = Package(
         .target(name: "DeepSkySession",
                 dependencies: ["DeepSkyCore", "DeepSkyCapture", "DeepSkyMetrics"]),
         .target(name: "DeepSkySynthetic", dependencies: ["DeepSkyCore", "DeepSkyCapture"]),
+        // Platform-agnostic on purpose: Core Image decodes DNGs on macOS too,
+        // so the whole pipeline is testable against real frames without a phone.
+        .target(name: "DeepSkyProcessing", dependencies: ["DeepSkyCore"]),
+        .testTarget(name: "DeepSkyProcessingTests",
+                    dependencies: ["DeepSkyProcessing", "DeepSkyCore"]),
         // iOS-only: the single target permitted to import AVFoundation.
         // Its contents are #if os(iOS) guarded so the macOS test build stays green.
         .target(name: "DeepSkyAVCapture",
