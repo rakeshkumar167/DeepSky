@@ -7,20 +7,44 @@ import Foundation
 /// Swift Testing rather than skipping it — gating has to happen in a trait, or
 /// a machine without the session gets failures instead of skips.
 enum SampleSession {
+    /// Finds the most recent exported session in ~/Downloads.
+    ///
+    /// Matches on structure (a `frames/` directory holding DNGs) rather than on
+    /// the folder name — sessions get renamed when they are exported, and
+    /// pattern-matching the name silently found nothing when that happened.
     static func frames() -> [URL] {
+        // Explicit override wins. Directory mtime is an unreliable way to pick
+        // "the newest session" — reading a folder can update it, which silently
+        // analysed the wrong session once.
+        if let path = ProcessInfo.processInfo.environment["DEEPSKY_SESSION"] {
+            let dir = URL(fileURLWithPath: path).appendingPathComponent("frames")
+            if let contents = try? FileManager.default.contentsOfDirectory(
+                at: dir, includingPropertiesForKeys: nil) {
+                return contents.filter { $0.pathExtension.lowercased() == "dng" }
+                    .sorted { $0.lastPathComponent < $1.lastPathComponent }
+            }
+            return []
+        }
+
         let downloads = FileManager.default.homeDirectoryForCurrentUser
             .appendingPathComponent("Downloads")
         guard let entries = try? FileManager.default.contentsOfDirectory(
-            at: downloads, includingPropertiesForKeys: nil) else { return [] }
-        for dir in entries where dir.lastPathComponent.contains("-astro-") {
+            at: downloads, includingPropertiesForKeys: [.contentModificationDateKey])
+        else { return [] }
+
+        let candidates = entries.compactMap { dir -> (URL, Date, [URL])? in
             let framesDir = dir.appendingPathComponent("frames")
-            if let dngs = try? FileManager.default.contentsOfDirectory(
-                at: framesDir, includingPropertiesForKeys: nil) {
-                return dngs.filter { $0.pathExtension.lowercased() == "dng" }
-                    .sorted { $0.lastPathComponent < $1.lastPathComponent }
-            }
+            guard let contents = try? FileManager.default.contentsOfDirectory(
+                at: framesDir, includingPropertiesForKeys: nil) else { return nil }
+            let dngs = contents.filter { $0.pathExtension.lowercased() == "dng" }
+                .sorted { $0.lastPathComponent < $1.lastPathComponent }
+            guard !dngs.isEmpty else { return nil }
+            let modified = (try? dir.resourceValues(forKeys: [.contentModificationDateKey]))?
+                .contentModificationDate ?? .distantPast
+            return (dir, modified, dngs)
         }
-        return []
+
+        return candidates.max { $0.1 < $1.1 }?.2 ?? []
     }
 
     static func exists() -> Bool { frames().count >= 2 }

@@ -47,6 +47,24 @@ func reportsStackingMeasurementOnRealFrames() throws {
     let result = try StackPipeline.run(frameURLs: frames, maxDimension: 512, progress: nil)
     let flagged = SampleSession.motionFlaggedFraction() ?? 1
 
+    // Exposure diagnostics. A clipped frame has no faint detail left to
+    // recover, so no amount of stretching can reveal any — and the symptom is
+    // exactly "stacking doesn't make it brighter".
+    func exposureReport(_ image: FloatImage, _ label: String) -> String {
+        let sorted = image.pixels.sorted()
+        let clipped = Double(image.pixels.filter { $0 >= 0.99 }.count)
+            / Double(image.pixels.count)
+        let nearWhite = Double(image.pixels.filter { $0 >= 0.9 }.count)
+            / Double(image.pixels.count)
+        return """
+        \(label)  min \(sorted.first ?? 0)  median \(sorted[sorted.count / 2])  max \(sorted.last ?? 0)
+                 clipped(>=0.99) \(Int(clipped * 100))%   near-white(>=0.9) \(Int(nearWhite * 100))%
+        """
+    }
+
+    let stretchSingle = AutoStretch.parameters(for: result.singleFrame)
+    let stretchStacked = AutoStretch.parameters(for: result.stacked)
+
     print("""
 
     === REAL DATA: stacking measurement ===
@@ -57,6 +75,15 @@ func reportsStackingMeasurementOnRealFrames() throws {
     sigma stacked       \(result.noiseStacked)
     improvement         \(result.improvementFactor)x
     ideal sqrt(N)       \(result.expectedImprovement)x
+
+    --- exposure ---
+    \(exposureReport(result.singleFrame, "single "))
+    \(exposureReport(result.stacked, "stacked"))
+
+    --- autostretch ---
+    single  sigma \(stretchSingle.sigma)  gain \(stretchSingle.gain)
+    stacked sigma \(stretchStacked.sigma)  gain \(stretchStacked.gain)
+    stack tolerates \(stretchStacked.gain / max(stretchSingle.gain, 1e-9))x the stretch
     =======================================
 
     """)
