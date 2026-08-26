@@ -24,3 +24,16 @@ import DeepSkyCore
     let decoded = try JSONDecoder().decode(ShutterSpeed.self, from: data)
     #expect(decoded == original)
 }
+
+@Test func handlesZeroSecondsGracefully() {
+    #expect(ShutterSpeed(seconds: 0.0).displayLabel == "N/A")
+}
+
+@Test func handlesNegativeSecondsGracefully() {
+    #expect(ShutterSpeed(seconds: -1.0).displayLabel == "N/A")
+}
+
+@Test func handlesNonFiniteSecondsGracefully() {
+    #expect(ShutterSpeed(seconds: Double.nan).displayLabel == "N/A")
+    #expect(ShutterSpeed(seconds: Double.infinity).displayLabel == "N/A")
+}

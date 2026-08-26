@@ -11,6 +11,9 @@ public struct ShutterSpeed: Sendable, Hashable, Codable, Comparable {
     /// longer read as decimals ("2.0s"). Astrophotographers work in the
     /// second-and-longer range, where reciprocals are unreadable.
     public var displayLabel: String {
+        guard seconds.isFinite && seconds > 0.0 else {
+            return "N/A"
+        }
         if seconds >= 1.0 {
             return String(format: "%.1fs", seconds)
         }
