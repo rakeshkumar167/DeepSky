@@ -62,6 +62,11 @@ func reportsStackingMeasurementOnRealFrames() throws {
         """
     }
 
+    // The same session stacked WITHOUT alignment, so the difference alignment
+    // makes on real data is visible rather than asserted.
+    let unaligned = try StackPipeline.run(frameURLs: frames, maxDimension: 512,
+                                          align: false, progress: nil)
+
     let stretchSingle = AutoStretch.parameters(for: result.singleFrame)
     let stretchStacked = AutoStretch.parameters(for: result.stacked)
 
@@ -72,9 +77,13 @@ func reportsStackingMeasurementOnRealFrames() throws {
     frames failed       \(result.framesFailed)
     flagged for motion  \(Int(flagged * 100))%
     sigma single        \(result.noiseSingle)
-    sigma stacked       \(result.noiseStacked)
-    improvement         \(result.improvementFactor)x
+
+    UNALIGNED  sigma \(unaligned.noiseStacked)   improvement \(unaligned.improvementFactor)x
+    ALIGNED    sigma \(result.noiseStacked)   improvement \(result.improvementFactor)x
     ideal sqrt(N)       \(result.expectedImprovement)x
+
+    drift corrected     \(result.offsets.map { "(\($0.x),\($0.y))" }.joined(separator: " "))
+    max drift           \(result.maxDriftPixels)px
 
     --- exposure ---
     \(exposureReport(result.singleFrame, "single "))
