@@ -11,6 +11,7 @@
 		A1B2C3D400000000000000F4 /* DeepSkyAVCapture in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D400000000000000F2 /* DeepSkyAVCapture */; };
 		A1B2C3D400000000000000F5 /* DeepSkyCapture in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D400000000000000F6 /* DeepSkyCapture */; };
 		A1B2C3D400000000000000F7 /* DeepSkySession in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D400000000000000F8 /* DeepSkySession */; };
+		A1B2C3D400000000000000FA /* DeepSkyProcessing in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D400000000000000FB /* DeepSkyProcessing */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 				A1B2C3D400000000000000F4 /* DeepSkyAVCapture in Frameworks */,
 				A1B2C3D400000000000000F5 /* DeepSkyCapture in Frameworks */,
 				A1B2C3D400000000000000F7 /* DeepSkySession in Frameworks */,
+				A1B2C3D400000000000000FA /* DeepSkyProcessing in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -80,6 +82,7 @@
 				A1B2C3D400000000000000F2 /* DeepSkyAVCapture */,
 				A1B2C3D400000000000000F6 /* DeepSkyCapture */,
 				A1B2C3D400000000000000F8 /* DeepSkySession */,
+				A1B2C3D400000000000000FB /* DeepSkyProcessing */,
 			);
 			productName = DeepSky;
 			productReference = A1B2C3D400000000000000E3 /* DeepSky.app */;
@@ -289,6 +292,10 @@
 		A1B2C3D400000000000000F8 /* DeepSkySession */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = DeepSkySession;
+		};
+		A1B2C3D400000000000000FB /* DeepSkyProcessing */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DeepSkyProcessing;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

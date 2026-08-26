@@ -23,6 +23,21 @@ struct SessionSummary: Identifiable {
 
     var effectiveExposure: Double { sensorExposure * Double(framesWritten) }
 
+    /// Fraction of frames the capture flagged for movement. The stacker has no
+    /// alignment stage, so this decides whether stacking can help at all.
+    var motionFlaggedFraction: Double {
+        framesWritten > 0 ? Double(framesFlagged) / Double(framesWritten) : 0
+    }
+
+    /// The DNGs on disk, in capture order.
+    var frameURLs: [URL] {
+        let dir = url.appendingPathComponent("frames")
+        guard let entries = try? FileManager.default.contentsOfDirectory(
+            at: dir, includingPropertiesForKeys: nil) else { return [] }
+        return entries.filter { $0.pathExtension.lowercased() == "dng" }
+            .sorted { $0.lastPathComponent < $1.lastPathComponent }
+    }
+
     static func loadAll() -> [SessionSummary] {
         let root = URL.documentsDirectory.appendingPathComponent("Sessions")
         let fm = FileManager.default
@@ -181,6 +196,25 @@ private struct SessionDetail: View {
                 }
                 .listRowBackground(DS.surface)
             }
+
+            Section {
+                if session.framesWritten >= 2 {
+                    NavigationLink {
+                        StackResultScreen(frameURLs: session.frameURLs,
+                                          nightMode: nightMode,
+                                          motionFlaggedFraction: session.motionFlaggedFraction)
+                    } label: {
+                        Label("Stack \(session.framesWritten) frames", systemImage: "square.3.layers.3d")
+                    }
+                } else {
+                    Text("At least two frames are needed to stack.")
+                        .font(.system(size: 13))
+                        .foregroundStyle(DS.secondaryText(nightMode))
+                }
+            } header: {
+                Text("Process")
+            }
+            .listRowBackground(DS.surface)
 
             Section {
                 ShareLink(item: session.url) {
