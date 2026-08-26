@@ -63,6 +63,7 @@ public actor CaptureCoordinator {
         var bytesPerFrame = 20 * 1_048_576
         var written = 0
         var flagged = 0
+        var interrupted = false
 
         // A zero (or negative) frame count is a degenerate plan, not an
         // error: `1...frameCount` would trap on an invalid range, so skip
@@ -102,7 +103,18 @@ public actor CaptureCoordinator {
                     // recovery flow exist precisely to recover it — writing
                     // completion.json here would misrepresent a torn session
                     // as a clean one.
-                    let frame = try await camera.captureFrame(index: index)
+                    // A frame that never arrives is an interruption, not a
+                    // fault: the screen locked, or the app went to the
+                    // background, and iOS revoked the camera. Every frame
+                    // already written is good, so end the session cleanly
+                    // rather than throwing them into the recovery flow.
+                    let frame: CapturedFrame
+                    do {
+                        frame = try await camera.captureFrame(index: index)
+                    } catch CaptureError.frameTimedOut {
+                        interrupted = true
+                        break captureLoop
+                    }
                     bytesPerFrame = frame.bytes
 
                     let name = isDark
@@ -133,7 +145,8 @@ public actor CaptureCoordinator {
             endedAt: Date(),
             framesWritten: isDark ? 0 : written,
             framesFlagged: flagged,
-            darksWritten: isDark ? written : 0)
+            darksWritten: isDark ? written : 0,
+            interrupted: interrupted)
         try await store.complete(completion, at: dir)
         return completion
     }

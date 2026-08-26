@@ -44,3 +44,26 @@ import DeepSkyCore
     let decoded = try JSONDecoder().decode(FrameRecord.self, from: json)
     #expect(decoded.flags == [.motion])
 }
+
+/// `interrupted` was added after sessions had already been written to real
+/// devices. Their completion.json has no such key, and a required field would
+/// make every one of them fail to decode — the Sessions list would simply go
+/// empty.
+@Test func completionWrittenBeforeInterruptedExistedStillDecodes() throws {
+    let json = """
+    {"endedAt":776000000,"framesWritten":19,"framesFlagged":2,"darksWritten":0}
+    """.data(using: .utf8)!
+    let decoded = try JSONDecoder().decode(SessionCompletion.self, from: json)
+    #expect(decoded.framesWritten == 19)
+    #expect(!decoded.interrupted)
+}
+
+@Test func completionRoundTripsTheInterruptedFlag() throws {
+    let completion = SessionCompletion(endedAt: Date(timeIntervalSince1970: 776000000),
+                                       framesWritten: 4, framesFlagged: 0,
+                                       darksWritten: 0, interrupted: true)
+    let data = try JSONEncoder().encode(completion)
+    let decoded = try JSONDecoder().decode(SessionCompletion.self, from: data)
+    #expect(decoded == completion)
+    #expect(decoded.interrupted)
+}

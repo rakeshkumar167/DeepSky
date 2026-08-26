@@ -28,7 +28,7 @@ struct StackResultScreen: View {
     @State private var result: StackResult?
     @State private var showingStacked = true
     @State private var stretch: StretchMode = .auto
-    @State private var progress = 0.0
+    @State private var framesDone = 0
     @State private var errorMessage: String?
 
     var body: some View {
@@ -50,13 +50,21 @@ struct StackResultScreen: View {
         .task { await stack() }
     }
 
+    /// Determinate, and driven by the pipeline's own per-frame callback.
+    ///
+    /// It used to pass `progress: nil` and animate nothing, so a stack that
+    /// was working normally was indistinguishable from one that had hung —
+    /// and a debug build made that wait long enough to look like the latter.
     private var working: some View {
         VStack(spacing: DS.sm) {
-            ProgressView(value: progress).tint(DS.accent(nightMode))
-            Text("Stacking \(frameURLs.count) frames…")
+            ProgressView(value: Double(framesDone), total: Double(max(frameURLs.count, 1)))
+                .tint(DS.accent(nightMode))
+            Text("Stacking frame \(min(framesDone + 1, frameURLs.count)) of \(frameURLs.count)…")
                 .font(.system(size: 13))
-                .foregroundStyle(DS.secondaryText(nightMode))
-            Text("Each frame is decoded, added, then discarded — memory stays flat however many there are.")
+                .foregroundStyle(DS.primaryText(nightMode))
+            Text(framesDone >= frameURLs.count
+                 ? "Measuring noise…"
+                 : "Each frame is decoded, aligned, added, then discarded — memory stays flat however many there are.")
                 .font(.system(size: 11))
                 .multilineTextAlignment(.center)
                 .foregroundStyle(DS.secondaryText(nightMode))
@@ -189,13 +197,27 @@ struct StackResultScreen: View {
 
     private func stack() async {
         let urls = frameURLs
+
+        // Off the main actor: decoding several 12MP RAWs would otherwise
+        // block the UI for seconds.
+        let work = Task.detached(priority: .userInitiated) { () throws -> StackResult in
+            try StackPipeline.run(frameURLs: urls, maxDimension: 1024) { done, _ in
+                Task { @MainActor in framesDone = done }
+            }
+        }
+
         do {
-            // Off the main actor: decoding several 12MP RAWs would otherwise
-            // block the UI for seconds.
-            let computed = try await Task.detached(priority: .userInitiated) {
-                try StackPipeline.run(frameURLs: urls, maxDimension: 1024, progress: nil)
-            }.value
-            result = computed
+            // `.task` cancels its own body when the view goes away, but a
+            // detached task is not its child and would otherwise keep burning
+            // CPU after the user has navigated off the screen.
+            result = try await withTaskCancellationHandler {
+                try await work.value
+            } onCancel: {
+                work.cancel()
+            }
+        } catch is CancellationError {
+            // The user left. There is nothing to report to a screen that is
+            // already gone.
         } catch {
             errorMessage = "Could not stack this session: \(error)"
         }

@@ -6,6 +6,14 @@ public enum CaptureError: Error, Sendable, Equatable {
     case exposureOutOfRange(requested: Double, max: Double)
     case isoOutOfRange(requested: Float, max: Float)
     case invalidLensIndex(Int)
+    /// A requested frame never arrived.
+    ///
+    /// AVFoundation stops delivering photos when the app leaves the
+    /// foreground — which is what happens the moment the screen locks — and a
+    /// continuation waiting on a callback that will never come blocks the
+    /// capture loop permanently. This is the loop's way out: the session ends
+    /// with the frames it already has instead of hanging.
+    case frameTimedOut(index: Int)
 }
 
 // CaptureSettings lives in DeepSkyCore/CaptureSettings.swift. It moved out

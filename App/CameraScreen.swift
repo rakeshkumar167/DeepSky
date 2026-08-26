@@ -108,8 +108,8 @@ struct CameraScreen: View {
         case .capturing(let done, let total):
             captureProgress(done: done, total: total)
 
-        case .finished(let written, let flagged):
-            resultStrip(written: written, flagged: flagged)
+        case .finished(let written, let flagged, let interrupted):
+            resultStrip(written: written, flagged: flagged, interrupted: interrupted)
 
         case .failed(let message):
             VStack(spacing: DS.sm) {
@@ -166,10 +166,17 @@ struct CameraScreen: View {
         .padding(.vertical, DS.md)
     }
 
-    private func resultStrip(written: Int, flagged: Int) -> some View {
+    private func resultStrip(written: Int, flagged: Int, interrupted: Bool) -> some View {
         VStack(spacing: DS.xs) {
             Text("\(written) frames captured").readout(22, weight: .bold)
                 .foregroundStyle(DS.primaryText(nightMode))
+            if interrupted {
+                Label("The camera stopped early — the screen locked or DeepSky left the foreground. These frames are fine.",
+                      systemImage: "moon.zzz.fill")
+                    .font(.system(size: 11))
+                    .multilineTextAlignment(.leading)
+                    .foregroundStyle(DS.status(1, night: nightMode))
+            }
             if flagged > 0 {
                 Label("\(flagged) flagged for movement — kept, not discarded",
                       systemImage: "exclamationmark.triangle.fill")

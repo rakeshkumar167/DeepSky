@@ -32,6 +32,12 @@ private final class FrameDelegate: NSObject, AVCapturePhotoCaptureDelegate, @unc
         continuation.resume(with: result)
     }
 
+    /// Ends the wait when the photo never arrives. Safe to call after a real
+    /// callback: `finish` ignores everything after the first result.
+    func timeOut(index: Int) {
+        finish(.failure(CaptureError.frameTimedOut(index: index)))
+    }
+
     func photoOutput(_ output: AVCapturePhotoOutput,
                      didFinishProcessingPhoto photo: AVCapturePhoto,
                      error: Error?) {
@@ -71,6 +77,11 @@ public actor AVCaptureDriver: CameraDevice {
     /// sensor has finished converging — measured on a real session, the first
     /// frame was still 83% darker than its successors without this.
     static let exposureSettleSeconds = 0.5
+
+    /// How long to wait for a single frame before giving up on it. Generous
+    /// against a one-second exposure plus ProRAW processing — this is a
+    /// watchdog for a photo that will never arrive, not a performance budget.
+    static let frameTimeoutSeconds = 20.0
 
     private let session = AVCaptureSession()
     private let output = AVCapturePhotoOutput()
@@ -241,6 +252,15 @@ public actor AVCaptureDriver: CameraDevice {
             let photoSettings = AVCapturePhotoSettings(rawPixelFormatType: rawFormat)
             photoSettings.flashMode = .off
             output.capturePhoto(with: photoSettings, delegate: delegate)
+
+            // A watchdog, not a deadline: an exposure is one second, so this
+            // only fires when the photo is genuinely never coming — the
+            // screen locked, the app was backgrounded, or the session was
+            // interrupted. Without it the loop waits forever.
+            Task { [weak delegate] in
+                try? await Task.sleep(for: .seconds(Self.frameTimeoutSeconds))
+                delegate?.timeOut(index: index)
+            }
         }
         delegates[index] = nil
 

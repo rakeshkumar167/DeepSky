@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import UIKit
 import DeepSkyCore
 import DeepSkyCapture
 import DeepSkySession
@@ -20,7 +21,7 @@ final class CaptureModel {
         case preparing
         case ready
         case capturing(done: Int, total: Int)
-        case finished(framesWritten: Int, flagged: Int)
+        case finished(framesWritten: Int, flagged: Int, interrupted: Bool)
         case failed(String)
     }
 
@@ -107,6 +108,13 @@ final class CaptureModel {
 
         phase = .capturing(done: 0, total: requestedFrames)
 
+        // iOS revokes camera access the moment the app leaves the foreground,
+        // and a locked screen does exactly that — no app can keep shooting
+        // through it. So the fix is to stop the screen locking in the first
+        // place, for as long as the session runs and no longer.
+        UIApplication.shared.isIdleTimerDisabled = true
+        defer { UIApplication.shared.isIdleTimerDisabled = false }
+
         do {
             let root = URL.documentsDirectory.appendingPathComponent("Sessions")
             try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
@@ -131,7 +139,8 @@ final class CaptureModel {
 
             lastSessionURL = root
             phase = .finished(framesWritten: completion.framesWritten,
-                              flagged: completion.framesFlagged)
+                              flagged: completion.framesFlagged,
+                              interrupted: completion.interrupted)
         } catch {
             phase = .failed("Capture failed: \(error)")
         }

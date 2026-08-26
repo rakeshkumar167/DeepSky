@@ -111,11 +111,28 @@ public struct SessionCompletion: Sendable, Codable, Hashable {
     public let framesWritten: Int
     public let framesFlagged: Int
     public let darksWritten: Int
+    /// True when the session ended early because the camera stopped
+    /// delivering — the screen locked, or the app left the foreground. The
+    /// frames written are still good; the plan simply did not finish.
+    public let interrupted: Bool
 
-    public init(endedAt: Date, framesWritten: Int, framesFlagged: Int, darksWritten: Int) {
+    public init(endedAt: Date, framesWritten: Int, framesFlagged: Int,
+                darksWritten: Int, interrupted: Bool = false) {
         self.endedAt = endedAt
         self.framesWritten = framesWritten
         self.framesFlagged = framesFlagged
         self.darksWritten = darksWritten
+        self.interrupted = interrupted
+    }
+
+    /// Sessions written before this field existed decode as not interrupted,
+    /// rather than failing to decode at all.
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        endedAt = try container.decode(Date.self, forKey: .endedAt)
+        framesWritten = try container.decode(Int.self, forKey: .framesWritten)
+        framesFlagged = try container.decode(Int.self, forKey: .framesFlagged)
+        darksWritten = try container.decode(Int.self, forKey: .darksWritten)
+        interrupted = try container.decodeIfPresent(Bool.self, forKey: .interrupted) ?? false
     }
 }

@@ -79,12 +79,22 @@ public enum StackPipeline {
         var reference: FloatImage?
         var failed = 0
         var offsets: [Offset] = []
-        /// Aligned frames retained for the temporal measurement, which needs
-        /// to difference them. Downscaled copies, so this stays modest even
-        /// for a long session.
-        var alignedFrames: [FloatImage] = []
+
+        // Half-stacks for the temporal measurement, accumulated as frames
+        // arrive. Retaining every aligned frame instead would grow with the
+        // session — 3MB per frame at this resolution — and defeat the whole
+        // point of streaming accumulation.
+        var evenHalf: FrameStacker?
+        var oddHalf: FrameStacker?
+        /// The first two aligned frames, the only ones the per-frame
+        /// measurement needs to difference.
+        var firstPair: [FloatImage] = []
+        var accepted = 0
 
         for (i, url) in frameURLs.enumerated() {
+            // Stacking a long session takes real time; a user who leaves the
+            // screen must not leave it running.
+            try Task.checkCancellation()
             defer { progress?(i + 1, frameURLs.count) }
             guard let decoded = try? RAWDecoder.decodeLuminance(
                     contentsOf: url, maxDimension: maxDimension) else {
@@ -93,6 +103,8 @@ public enum StackPipeline {
             }
             if stacker == nil {
                 stacker = FrameStacker(width: decoded.width, height: decoded.height)
+                evenHalf = FrameStacker(width: decoded.width, height: decoded.height)
+                oddHalf = FrameStacker(width: decoded.width, height: decoded.height)
                 reference = decoded
             }
             guard let reference else { failed += 1; continue }
@@ -110,7 +122,13 @@ public enum StackPipeline {
                 }
             }
 
-            if stacker?.add(frame) == false { failed += 1 } else { alignedFrames.append(frame) }
+            if stacker?.add(frame) == false {
+                failed += 1
+            } else {
+                if accepted % 2 == 0 { evenHalf?.add(frame) } else { oddHalf?.add(frame) }
+                if firstPair.count < 2 { firstPair.append(frame) }
+                accepted += 1
+            }
         }
 
         guard let stacker, let reference, let stacked = stacker.result() else {
@@ -124,6 +142,16 @@ public enum StackPipeline {
             throw PipelineError.noBackgroundRegion
         }
 
+        // Both halves must hold at least one frame, or their difference is not
+        // a comparison of two independent stacks of the same scene.
+        let halfStackNoise: Double? = {
+            guard let even = evenHalf?.result(), let odd = oddHalf?.result(),
+                  (evenHalf?.frameCount ?? 0) > 0, (oddHalf?.frameCount ?? 0) > 0 else {
+                return nil
+            }
+            return TemporalNoise.ofHalves(even, odd, in: region)
+        }()
+
         return StackResult(
             stacked: stacked,
             singleFrame: reference,
@@ -131,10 +159,10 @@ public enum StackPipeline {
             framesFailed: failed,
             noiseSingle: NoiseMeasurement.standardDeviation(reference, in: region),
             noiseStacked: NoiseMeasurement.standardDeviation(stacked, in: region),
-            temporalNoiseSingle: alignedFrames.count >= 2
-                ? TemporalNoise.perFrame(alignedFrames[0], alignedFrames[1], in: region)
+            temporalNoiseSingle: firstPair.count >= 2
+                ? TemporalNoise.perFrame(firstPair[0], firstPair[1], in: region)
                 : nil,
-            temporalNoiseStacked: TemporalNoise.ofStack(alignedFrames, in: region),
+            temporalNoiseStacked: halfStackNoise,
             offsets: offsets)
     }
 }

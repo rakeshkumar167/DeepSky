@@ -289,3 +289,83 @@ private func tempRoot() -> URL {
         #expect(index == 99)
     }
 }
+
+/// Delivers frames normally until `failAt`, then reports a timeout — the way
+/// the real driver behaves once iOS has revoked the camera because the screen
+/// locked or the app left the foreground.
+private actor TimingOutCamera: CameraDevice {
+    nonisolated let capabilities: DeviceCapabilities
+    private let failAt: Int
+    private var applied: CaptureSettings?
+
+    init(capabilities: DeviceCapabilities, failAt: Int) {
+        self.capabilities = capabilities
+        self.failAt = failAt
+    }
+
+    func apply(_ settings: CaptureSettings) async throws { applied = settings }
+
+    func captureFrame(index: Int) async throws -> CapturedFrame {
+        guard let applied else { throw CaptureError.settingsNotApplied }
+        guard index < failAt else { throw CaptureError.frameTimedOut(index: index) }
+        return CapturedFrame(index: index, rawData: Data(repeating: 0xAB, count: 64),
+                             capturedAt: Date(timeIntervalSince1970: 776000000),
+                             appliedSettings: applied)
+    }
+}
+
+/// A locked screen must cost the remaining frames, never the captured ones.
+/// Before this, `captureFrame` waited on a callback that would never arrive
+/// and the session hung indefinitely.
+@Test func aFrameTimeoutEndsTheSessionAndKeepsTheFramesAlreadyWritten() async throws {
+    let root = tempRoot()
+    let coordinator = CaptureCoordinator(
+        camera: TimingOutCamera(capabilities: caps(), failAt: 4),
+        store: SessionStore(root: root),
+        sensor: StubSensor())
+
+    let completion = try await coordinator.run(
+        manifest: manifest(frames: 10), settings: stdSettings(), isDark: false)
+
+    #expect(completion.framesWritten == 3)
+    #expect(completion.interrupted)
+}
+
+/// The session must still be finalised, so it appears as a real session
+/// rather than being stranded in the recovery flow.
+@Test func anInterruptedSessionIsStillFinalisedOnDisk() async throws {
+    let root = tempRoot()
+    let coordinator = CaptureCoordinator(
+        camera: TimingOutCamera(capabilities: caps(), failAt: 2),
+        store: SessionStore(root: root),
+        sensor: StubSensor())
+
+    _ = try await coordinator.run(manifest: manifest(frames: 8),
+                                  settings: stdSettings(), isDark: false)
+
+    let sessions = try FileManager.default.contentsOfDirectory(
+        at: root, includingPropertiesForKeys: nil)
+    let directory = try #require(sessions.first)
+    let data = try Data(contentsOf: directory.appendingPathComponent("completion.json"))
+    let decoder = JSONDecoder()
+    decoder.dateDecodingStrategy = .iso8601      // matches what SessionStore writes
+    let decoded = try decoder.decode(SessionCompletion.self, from: data)
+
+    #expect(decoded.framesWritten == 1)
+    #expect(decoded.interrupted)
+}
+
+/// A session that runs to plan is not flagged as interrupted.
+@Test func anUninterruptedSessionIsNotFlagged() async throws {
+    let root = tempRoot()
+    let coordinator = CaptureCoordinator(
+        camera: SyntheticDriver(capabilities: caps(), seed: 7),
+        store: SessionStore(root: root),
+        sensor: StubSensor())
+
+    let completion = try await coordinator.run(
+        manifest: manifest(frames: 3), settings: stdSettings(), isDark: false)
+
+    #expect(completion.framesWritten == 3)
+    #expect(!completion.interrupted)
+}

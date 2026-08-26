@@ -42,7 +42,77 @@ private func starField(size: Int, shiftX: Int, shiftY: Int,
     return FloatImage(width: size, height: size, pixels: pixels)!
 }
 
+/// A star field spread across the whole frame, for images larger than the
+/// correlation window. `starField` clusters its stars in the top-left of a
+/// large frame, which the centred crop would legitimately exclude.
+private func wideStarField(width: Int, height: Int, shiftX: Int, shiftY: Int,
+                           seed: UInt64 = 5) -> FloatImage {
+    var noise = Noise(seed: seed)
+    var pixels = [Float](repeating: 0.05, count: width * height)
+    for i in 0..<pixels.count { pixels[i] += Float(noise.gaussian(0.004)) }
+
+    // Fractional positions, so stars land throughout the frame at any size.
+    let stars: [(Double, Double, Float)] = [
+        (0.20, 0.25, 0.9), (0.65, 0.18, 0.6), (0.45, 0.55, 0.75),
+        (0.80, 0.72, 0.5), (0.30, 0.80, 0.65), (0.55, 0.40, 0.55),
+        (0.70, 0.50, 0.7), (0.38, 0.35, 0.6),
+    ]
+    for (fx, fy, amplitude) in stars {
+        let cx = Int(fx * Double(width)) + shiftX
+        let cy = Int(fy * Double(height)) + shiftY
+        for dy in -3...3 {
+            for dx in -3...3 {
+                let x = cx + dx, y = cy + dy
+                guard x >= 0, x < width, y >= 0, y < height else { continue }
+                let r2 = Double(dx * dx + dy * dy)
+                pixels[y * width + x] += amplitude * Float(exp(-r2 / 2.0))
+            }
+        }
+    }
+    return FloatImage(width: width, height: height, pixels: pixels)!
+}
+
 struct FrameAlignerTests {
+
+    /// Frames larger than `correlationWindow` are correlated over a centred
+    /// crop. The shift must still come back exactly — the crop is a cost
+    /// optimisation, and an optimisation that changed the answer would be a
+    /// bug, not an optimisation.
+    @Test func recoversAShiftOnFramesLargerThanTheCorrelationWindow() {
+        let width = 768, height = 1024
+        #expect(min(width, height) > FrameAligner.correlationWindow,
+                "this test is pointless unless the crop actually engages")
+
+        let reference = wideStarField(width: width, height: height, shiftX: 0, shiftY: 0)
+        for (dx, dy) in [(6, -4), (-11, 8), (23, 17)] {
+            let shifted = wideStarField(width: width, height: height,
+                                        shiftX: dx, shiftY: dy, seed: 88)
+            let offset = FrameAligner.estimateOffset(of: shifted, against: reference,
+                                                     maxShift: 61)
+            #expect(offset.x == dx && offset.y == dy,
+                    "expected (\(dx), \(dy)), got (\(offset.x), \(offset.y))")
+        }
+    }
+
+    /// The crop must be centred and leave the pixels it keeps untouched.
+    @Test func centreCropTakesTheMiddleOfTheFrame() throws {
+        let image = wideStarField(width: 700, height: 900, shiftX: 0, shiftY: 0)
+        let cropped = try #require(FrameAligner.centreCrop(image, size: 512))
+        #expect(cropped.width == 512 && cropped.height == 512)
+
+        let originX = (700 - 512) / 2, originY = (900 - 512) / 2
+        #expect(cropped[0, 0] == image[originX, originY])
+        #expect(cropped[511, 511] == image[originX + 511, originY + 511])
+    }
+
+    /// An image already inside the window comes back untouched rather than
+    /// being padded or resized.
+    @Test func centreCropLeavesSmallImagesAlone() throws {
+        let image = starField(size: 96, shiftX: 0, shiftY: 0)
+        let cropped = try #require(FrameAligner.centreCrop(image, size: 512))
+        #expect(cropped.width == 96 && cropped.height == 96)
+    }
+
 
     /// THE test. If a known shift cannot be recovered, nothing downstream works.
     @Test func recoversAKnownShift() {

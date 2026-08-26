@@ -44,9 +44,20 @@ public enum TemporalNoise {
         for (i, frame) in frames.enumerated() {
             _ = (i % 2 == 0 ? even.add(frame) : odd.add(frame))
         }
-        guard let a = even.result(), let b = odd.result(),
-              let diff = difference(a, b) else { return nil }
+        guard let a = even.result(), let b = odd.result() else { return nil }
+        return ofHalves(a, b, in: region)
+    }
 
+    /// The same measurement from two half-stacks the caller accumulated
+    /// itself.
+    ///
+    /// `ofStack` needs every frame in memory at once, which defeats the
+    /// streaming accumulation that lets a long session stack at all. A caller
+    /// that adds each frame to an even or odd accumulator as it decodes gets
+    /// this measurement for constant memory instead.
+    public static func ofHalves(_ a: FloatImage, _ b: FloatImage,
+                                in region: PatchRegion) -> Double? {
+        guard let diff = difference(a, b) else { return nil }
         return NoiseMeasurement.standardDeviation(diff, in: region) / 2.0
     }
 
