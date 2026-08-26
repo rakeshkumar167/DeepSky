@@ -34,7 +34,7 @@ public actor CaptureCoordinator {
         // Checked before `camera.apply` so this guard is the one that
         // actually fires; `apply` performs the same bounds check and would
         // otherwise make this guard unreachable dead code.
-        guard settings.lensIndex < manifest.capabilities.lenses.count,
+        guard settings.lensIndex >= 0, settings.lensIndex < manifest.capabilities.lenses.count,
               let format = manifest.capabilities.lenses[settings.lensIndex].formats.first else {
             throw CaptureError.invalidLensIndex(settings.lensIndex)
         }
@@ -104,7 +104,7 @@ public actor CaptureCoordinator {
                     let name = isDark
                         ? String(format: "darks/dark_%04d.dng", index)
                         : String(format: "frames/frame_%04d.dng", index)
-                    try frame.rawData.write(to: dir.appendingPathComponent(name))
+                    try frame.rawData.write(to: dir.appendingPathComponent(name), options: .atomic)
 
                     var flags: [FrameFlag] = []
                     if stability.band == .poor { flags.append(.motion) }

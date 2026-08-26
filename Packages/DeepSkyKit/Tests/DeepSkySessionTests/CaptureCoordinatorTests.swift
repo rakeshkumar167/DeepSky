@@ -51,14 +51,6 @@ private func caps() -> DeviceCapabilities {
                               probedAt: Date(timeIntervalSince1970: 776000000))
 }
 
-private func manifest(frames: Int) -> SessionManifest {
-    SessionManifest(id: UUID().uuidString, name: "Test",
-                    startedAt: Date(timeIntervalSince1970: 776000000),
-                    plan: CapturePlan(sensorExposure: ShutterSpeed(seconds: 1.0),
-                                      intervalSeconds: 0.0, frameCount: frames),
-                    capabilities: caps())
-}
-
 private func stdSettings() -> CaptureSettings {
     CaptureSettings(lensIndex: 0, iso: 1600, exposure: ShutterSpeed(seconds: 1.0),
                     lensPosition: 1.0, whiteBalanceKelvin: 3900, exposureBias: 0)
@@ -69,6 +61,14 @@ private func stdSettings() -> CaptureSettings {
 private func rejectedSettings() -> CaptureSettings {
     CaptureSettings(lensIndex: 0, iso: 1600, exposure: ShutterSpeed(seconds: 5.0),
                     lensPosition: 1.0, whiteBalanceKelvin: 3900, exposureBias: 0)
+}
+
+private func manifest(frames: Int, settings: CaptureSettings = stdSettings()) -> SessionManifest {
+    SessionManifest(id: UUID().uuidString, name: "Test",
+                    startedAt: Date(timeIntervalSince1970: 776000000),
+                    plan: CapturePlan(sensorExposure: ShutterSpeed(seconds: 1.0),
+                                      intervalSeconds: 0.0, frameCount: frames),
+                    capabilities: caps(), settings: settings)
 }
 
 private func tempRoot() -> URL {
@@ -242,7 +242,50 @@ private func tempRoot() -> URL {
         .contentsOfDirectory(at: root, includingPropertiesForKeys: nil)[0]
     let completionURL = dir.appendingPathComponent("completion.json")
     #expect(FileManager.default.fileExists(atPath: completionURL.path))
-    let completion = try JSONDecoder().decode(SessionCompletion.self,
-                                              from: Data(contentsOf: completionURL))
+    // completion.json is written with .iso8601 date encoding (spec) — the
+    // decoder here must match, or this is exactly the silent read-back
+    // break FIX 4(a) warns about.
+    let decoder = JSONDecoder()
+    decoder.dateDecodingStrategy = .iso8601
+    let completion = try decoder.decode(SessionCompletion.self,
+                                        from: Data(contentsOf: completionURL))
     #expect(completion.framesWritten == 0)
+}
+
+@Test func negativeLensIndexThrowsInvalidLensIndexRatherThanTrapping() async throws {
+    let root = tempRoot()
+    let coordinator = CaptureCoordinator(
+        camera: SyntheticDriver(capabilities: caps(), seed: 42),
+        store: SessionStore(root: root),
+        sensor: StubSensor())
+
+    var negative = stdSettings()
+    negative.lensIndex = -1
+
+    do {
+        _ = try await coordinator.run(manifest: manifest(frames: 5, settings: negative),
+                                      settings: negative, isDark: false)
+        Issue.record("expected invalidLensIndex to be thrown")
+    } catch CaptureError.invalidLensIndex(let index) {
+        #expect(index == -1)
+    }
+}
+
+@Test func outOfRangeLensIndexThrowsInvalidLensIndexRatherThanTrapping() async throws {
+    let root = tempRoot()
+    let coordinator = CaptureCoordinator(
+        camera: SyntheticDriver(capabilities: caps(), seed: 42),
+        store: SessionStore(root: root),
+        sensor: StubSensor())
+
+    var outOfRange = stdSettings()
+    outOfRange.lensIndex = 99
+
+    do {
+        _ = try await coordinator.run(manifest: manifest(frames: 5, settings: outOfRange),
+                                      settings: outOfRange, isDark: false)
+        Issue.record("expected invalidLensIndex to be thrown")
+    } catch CaptureError.invalidLensIndex(let index) {
+        #expect(index == 99)
+    }
 }
