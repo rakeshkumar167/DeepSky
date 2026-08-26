@@ -1,0 +1,38 @@
+# macOS
+.DS_Store
+
+# Xcode
+build/
+DerivedData/
+*.xcuserstate
+*.xcuserdatad/
+xcuserdata/
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Xcode project cruft (keep the project file itself)
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+
+# Signing / secrets — never commit
+*.mobileprovision
+*.p12
+*.cer
+*.p8
+AuthKey_*.p8
+ExportOptions.plist
+fastlane/report.xml
+
+# Capture output — sessions are large binary RAW data
+Sessions/
+*.dng
+*.xip

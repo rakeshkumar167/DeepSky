@@ -1,0 +1,1389 @@
+# iPhone Astrophotography Camera
+
+## 1. Product Vision
+
+Build a professional iPhone camera application specifically optimized for astrophotography.
+
+The app should combine:
+
+1. Manual camera controls
+2. Long-exposure capture
+3. RAW/ProRAW acquisition where supported
+4. Multi-frame stacking
+5. Computational noise reduction
+6. Exposure and color correction
+7. Star-preserving enhancement
+8. Automatic astrophotography-specific image processing
+
+The goal is to produce significantly better night-sky photographs than the standard iPhone camera while keeping the result natural and preserving actual stars.
+
+---
+
+# 2. Primary Use Cases
+
+### A. Milky Way photography
+
+Capture the Milky Way with foreground objects and landscape.
+
+### B. Star-field photography
+
+Capture maximum numbers of visible stars with minimal noise.
+
+### C. Night landscape
+
+Capture a bright foreground together with a detailed sky.
+
+### D. Moon + stars
+
+Provide specialized exposure handling for scenes containing the Moon.
+
+### E. Star trails
+
+Capture a sequence of exposures and combine them into a continuous star-trail image.
+
+### F. Deep-sky experimentation
+
+Allow advanced users to capture many short/medium exposures for stacking.
+
+---
+
+# 3. Camera Architecture
+
+The app should use Apple's native camera frameworks rather than accessing the camera as a simple JPEG source.
+
+Primary technologies:
+
+* AVFoundation
+* Core Image
+* Accelerate/vImage
+* Metal
+* Metal Performance Shaders
+* Core ML only where beneficial
+* PhotoKit
+* Image I/O
+* RAW/ProRAW APIs where supported by the device
+
+The architecture should be modular:
+
+```text
+Camera
+   ↓
+Sensor Capture
+   ↓
+RAW / ProRAW
+   ↓
+Frame Buffer
+   ↓
+Calibration
+   ↓
+Frame Alignment
+   ↓
+Stacking
+   ↓
+Noise Reduction
+   ↓
+Exposure / Color Processing
+   ↓
+Astro Enhancement
+   ↓
+Tone Mapping
+   ↓
+Final Image
+```
+
+---
+
+# 4. Camera Controls
+
+The main camera screen should expose professional controls.
+
+## Exposure
+
+* Shutter speed
+* ISO
+* Exposure compensation
+* Focus
+* White balance
+* Lens selection
+* Exposure lock
+* Focus lock
+
+Example shutter range:
+
+```text
+1/8000
+1/4000
+...
+1 sec
+2 sec
+5 sec
+10 sec
+15 sec
+20 sec
+30 sec
+```
+
+The maximum practical exposure should depend on the camera hardware and API limitations.
+
+The UI must never pretend that a single sensor exposure is longer than the hardware actually permits.
+
+Instead, for very long exposures, the app should automatically switch to:
+
+```text
+Long Exposure Mode
+      ↓
+Multiple shorter exposures
+      ↓
+Frame stacking
+      ↓
+Equivalent long exposure
+```
+
+---
+
+# 5. Astro Mode
+
+Add a dedicated mode:
+
+**ASTRO**
+
+When activated, the app automatically configures a starting exposure based on:
+
+* Selected lens
+* Sensor
+* Current light level
+* Estimated sky brightness
+* Device orientation
+* Camera stability
+* Focal length
+* Expected star movement
+
+Suggested initial settings:
+
+```text
+Lens: Main
+Focus: Manual → Infinity
+ISO: 800–3200
+Shutter: 5–20 sec
+WB: 3500–4500 K
+Capture: Multiple frames
+```
+
+These are starting points, not fixed values.
+
+---
+
+# 6. Exposure Strategy
+
+The app should optimize for signal-to-noise ratio rather than simply maximizing shutter duration.
+
+For example:
+
+```text
+30 × 10 sec exposures
+```
+
+can be processed into an effective image with substantially better noise characteristics than one extremely long exposure.
+
+The app should expose:
+
+### Total Capture Time
+
+```text
+10 sec
+30 sec
+1 min
+2 min
+5 min
+10 min
+20 min
+30 min
+Custom
+```
+
+Example:
+
+```text
+Total capture: 5 min
+Individual exposure: 10 sec
+Frames: 30
+```
+
+---
+
+# 7. Live Preview
+
+During capture, show a continuously updated preview.
+
+Display:
+
+* Histogram
+* Exposure level
+* ISO
+* Shutter
+* Focus distance
+* Number of frames captured
+* Total capture duration
+* Estimated sky brightness
+* Star visibility estimate
+* Stability indicator
+
+Example:
+
+```text
+       ASTRO
+
+ISO       1600
+SHUTTER   10.0s
+FOCUS     ∞
+WB        3900K
+
+Frames    17 / 30
+Time      02:50
+
+──────────────
+   Histogram
+──────────────
+
+★ Sky Quality: GOOD
+```
+
+---
+
+# 8. Manual Focus
+
+Astrophotography requires reliable infinity focus.
+
+Provide:
+
+### Focus slider
+
+```text
+Near ──────────────── ∞
+```
+
+Add:
+
+### Star Focus Assist
+
+The app analyzes bright point sources in the preview and calculates a sharpness score.
+
+User adjusts focus until:
+
+```text
+STAR SHARPNESS
+███████████████████ 98%
+```
+
+The app should also provide:
+
+**Auto Infinity Focus**
+
+which searches around infinity and chooses the focus position producing the smallest star profiles.
+
+---
+
+# 9. Digital Magnification
+
+Provide:
+
+* 1×
+* 2×
+* 3×
+* 5×
+* 10× focus magnification
+
+When magnified, show a selected star/region.
+
+Example:
+
+```text
+┌───────────────────────┐
+│                       │
+│          ✦            │
+│                       │
+└───────────────────────┘
+
+Focus Sharpness: 94%
+```
+
+---
+
+# 10. RAW Capture
+
+Where hardware/API support permits, capture:
+
+### Preferred
+
+* Apple ProRAW
+* Bayer RAW
+* DNG
+
+Avoid JPEG as the primary astrophotography capture format.
+
+Store the original source frames separately from the processed output.
+
+Example project:
+
+```text
+Astro Session
+ ├── Frame_001.dng
+ ├── Frame_002.dng
+ ├── Frame_003.dng
+ ├── ...
+ ├── calibration/
+ └── final.dng
+```
+
+---
+
+# 11. Multi-Frame Stacking
+
+This is the core computational feature.
+
+For N captured frames:
+
+```text
+Frame 1 ─┐
+Frame 2 ─┤
+Frame 3 ─┤
+Frame 4 ─┼── Alignment ── Stacking
+...      ┤
+Frame N ─┘
+```
+
+Before stacking:
+
+1. Detect stars
+2. Determine frame translation
+3. Estimate rotation
+4. Reject corrupted frames
+5. Correct lens distortion
+6. Normalize exposure
+7. Align stars
+
+Then stack using robust statistical methods.
+
+Possible algorithms:
+
+* Mean stacking
+* Median stacking
+* Sigma clipping
+* Weighted averaging
+
+Default:
+
+**Weighted sigma-clipped stacking**
+
+because it can suppress random noise while retaining stars.
+
+---
+
+# 12. Star Alignment
+
+The app must distinguish between:
+
+### Stars
+
+which should remain aligned,
+
+and
+
+### Ground
+
+which may move relative to the stars because of Earth's rotation.
+
+This enables two important modes.
+
+## Sky Mode
+
+Align frames based on stars.
+
+Best for:
+
+* Milky Way
+* Star fields
+* Deep sky
+
+## Landscape Mode
+
+Keep the ground fixed while processing the sky separately.
+
+Best for:
+
+* Milky Way + mountains
+* Buildings + stars
+* Trees + sky
+
+---
+
+# 13. Sky/Ground Processing
+
+For landscape astrophotography, process the image as two regions:
+
+```text
+             SKY
+ ┌─────────────────────────┐
+ │  ✦     ✦       ✦       │
+ │     ✦      ✦           │
+ │ ✦       Milky Way      │
+ ├─────────────────────────┤
+ │                         │
+ │       LANDSCAPE         │
+ │                         │
+ └─────────────────────────┘
+```
+
+Sky:
+
+* Align to stars
+* Stack aggressively
+* Increase signal
+* Reduce noise
+
+Ground:
+
+* Keep geometrically stable
+* Use lower-noise exposure
+* Preserve natural textures
+
+Then blend the two.
+
+The transition should be automatically detected but manually adjustable.
+
+---
+
+# 14. Noise Reduction
+
+Astrophotography noise should not be treated like ordinary photography noise.
+
+Separate:
+
+* Photon noise
+* Read noise
+* Hot pixels
+* Fixed-pattern noise
+* Color noise
+* Thermal noise
+
+Processing pipeline:
+
+```text
+RAW
+ ↓
+Black-level correction
+ ↓
+Hot-pixel detection
+ ↓
+Bad-pixel correction
+ ↓
+Frame stacking
+ ↓
+Chrominance noise reduction
+ ↓
+Luminance noise reduction
+```
+
+Avoid excessive smoothing.
+
+Stars must remain point-like.
+
+---
+
+# 15. Hot Pixel Removal
+
+Long exposures can create bright fixed pixels.
+
+The app should identify pixels that remain at the same sensor coordinates across frames.
+
+If:
+
+```text
+Pixel X = bright
+Frame 1 = bright
+Frame 2 = bright
+Frame 3 = bright
+Frame 4 = bright
+```
+
+and its location does not move with the stars, classify it as a sensor artifact.
+
+Remove it before final processing.
+
+---
+
+# 16. Dark Frame Calibration
+
+Advanced mode should support dark frames.
+
+User can capture:
+
+**Dark Frame**
+
+with:
+
+```text
+Lens covered
+Same ISO
+Same shutter
+Same temperature
+```
+
+The app can subtract the sensor noise pattern.
+
+Example:
+
+```text
+Light Frame
+      -
+Dark Frame
+      =
+Calibrated Frame
+```
+
+For ordinary users, the app should automatically maintain reusable calibration profiles when practical.
+
+---
+
+# 17. Brightness Recovery
+
+After stacking, the image will often appear extremely dark.
+
+Use a controlled tone-processing pipeline:
+
+```text
+Linear RAW
+ ↓
+Black point adjustment
+ ↓
+Exposure recovery
+ ↓
+White balance
+ ↓
+Contrast
+ ↓
+Local contrast
+ ↓
+Highlight protection
+ ↓
+Shadow recovery
+ ↓
+Tone mapping
+```
+
+Do not simply increase brightness.
+
+The goal is to recover faint astronomical structures while preserving natural contrast.
+
+---
+
+# 18. Milky Way Enhancement
+
+Provide an optional:
+
+**Milky Way Enhance**
+
+slider:
+
+```text
+OFF ─────────────── MAX
+```
+
+It should primarily enhance existing signal.
+
+Processing may include:
+
+* Local contrast enhancement
+* Background gradient removal
+* Selective luminance enhancement
+* Color separation
+* Controlled dehazing
+
+The algorithm should not manufacture Milky Way structures where none exist.
+
+---
+
+# 19. Star Enhancement
+
+Optional:
+
+**Stars**
+
+```text
+Natural ─────── Enhanced
+```
+
+Enhancement should:
+
+* Increase star visibility
+* Preserve star color
+* Avoid enlarging stars excessively
+* Avoid creating fake stars
+
+Bright stars should retain their natural diffraction/optical characteristics.
+
+---
+
+# 20. Light Pollution Removal
+
+Include:
+
+**Light Pollution**
+
+```text
+OFF
+LOW
+MEDIUM
+HIGH
+```
+
+Estimate the background sky gradient and subtract it.
+
+For example:
+
+```text
+Original
+████████████████
+
+Estimated Gradient
+████████████████
+
+Corrected Sky
+░░░░░░░░░░░░░░░░
+```
+
+The algorithm must preserve genuine large-scale Milky Way structures.
+
+---
+
+# 21. White Balance
+
+Provide astrophotography-specific presets:
+
+### Auto
+
+### Daylight
+
+### Tungsten
+
+### Moonlight
+
+### Astro Neutral
+
+### Custom Kelvin
+
+Recommended initial range:
+
+```text
+3000K – 5000K
+```
+
+Allow precise manual adjustment.
+
+---
+
+# 22. Color Processing
+
+Preserve star colors.
+
+Avoid aggressively neutralizing the image.
+
+Stars may contain:
+
+* Blue
+* White
+* Yellow
+* Orange
+* Red
+
+The final image should retain these differences.
+
+---
+
+# 23. Histogram
+
+Provide RGB and luminance histogram.
+
+Include warnings:
+
+```text
+⚠ Sky background clipping
+⚠ Highlights clipping
+✓ Good exposure
+```
+
+A separate **Astro Histogram** should emphasize the lower luminance range where most astronomical information exists.
+
+---
+
+# 24. Capture Session
+
+Instead of saving every photograph independently, treat astrophotography as a session.
+
+Example:
+
+```text
+MILKY WAY — 12:43 AM
+
+Lens       1×
+ISO        1600
+Exposure   10 sec
+Frames     60
+Duration   10 min
+Temperature 18°C
+
+[ STOP CAPTURE ]
+```
+
+After capture:
+
+```text
+Processing...
+
+Aligning stars       ✓
+Removing artifacts   ✓
+Stacking              ███████░░░
+Noise reduction       ░░░░░░░░░░
+Tone mapping          ░░░░░░░░░░
+```
+
+---
+
+# 25. Processing Presets
+
+Provide presets:
+
+### Natural Astro
+
+Minimal processing.
+
+### Milky Way
+
+Strong sky recovery.
+
+### Deep Sky
+
+Maximum stacking and faint-object recovery.
+
+### Night Landscape
+
+Balanced sky + foreground.
+
+### Low Light
+
+Optimized for severe light pollution.
+
+### Star Trails
+
+Specialized trail stacking.
+
+---
+
+# 26. Star Trail Mode
+
+Capture a sequence over a long period.
+
+Example:
+
+```text
+Exposure: 10 sec
+Interval: 1 sec
+Duration: 60 min
+Frames: ~3300
+```
+
+Combine frames into continuous trails.
+
+Provide:
+
+* Continuous trails
+* Timelapse
+* Brightness blending
+* Gap removal
+* Direction control
+
+---
+
+# 27. Computational Constraints
+
+The app should never imply that the iPhone sensor physically exposes continuously for an hour.
+
+Instead:
+
+```text
+10 sec exposure
++
+10 sec exposure
++
+10 sec exposure
+...
+```
+
+creates the computational equivalent of a much longer capture.
+
+The UI should clearly distinguish:
+
+**Sensor Exposure**
+
+from
+
+**Total Capture Time**
+
+---
+
+# 28. Image Quality Modes
+
+### Quick
+
+10–30 seconds.
+
+Minimal processing.
+
+### Balanced
+
+1–5 minutes.
+
+Recommended default.
+
+### Maximum Quality
+
+5–20+ minutes.
+
+Maximum stacking and processing.
+
+### Expert
+
+User controls everything.
+
+---
+
+# 29. Device Adaptation
+
+The app must detect the exact iPhone model and available camera hardware.
+
+Automatically determine:
+
+* Available lenses
+* Sensor resolution
+* RAW capability
+* Maximum exposure capability
+* ISO range
+* Supported pixel formats
+* Optical stabilization characteristics
+
+Do not assume all iPhones have the same camera capabilities.
+
+---
+
+# 30. Stabilization
+
+Require a stable device for maximum-quality capture.
+
+Detect:
+
+* Tripod stability
+* Hand movement
+* Vibrations
+
+Show:
+
+```text
+STABILITY
+
+██████████████████  Excellent
+```
+
+If the device moves significantly:
+
+```text
+⚠ Movement detected
+
+Discard current frame?
+```
+
+The app should automatically reject badly blurred frames.
+
+---
+
+# 31. Orientation
+
+Support:
+
+* Portrait
+* Landscape
+* Upside down
+
+Record orientation metadata.
+
+Optional:
+
+**Celestial Compass**
+
+Show:
+
+```text
+N
+      ✦
+      │
+W ────┼──── E
+      │
+      S
+```
+
+With the device's current pointing direction.
+
+---
+
+# 32. Astronomy Information
+
+Optional overlay:
+
+* Compass
+* Altitude
+* Azimuth
+* Moon phase
+* Moon altitude
+* Milky Way position
+* Galactic center direction
+* Sunrise/sunset
+* Astronomical twilight
+
+This should help users compose the photograph before starting the capture.
+
+---
+
+# 33. Advanced Capture Planning
+
+Before capture, show:
+
+```text
+ASTRO CONDITIONS
+
+Sky darkness       ★★★★★
+Moon               8%
+Cloud probability  4%
+Milky Way          Excellent
+Visibility         Excellent
+
+Recommended:
+ISO       1600
+Exposure  10 sec
+Frames    60
+```
+
+---
+
+# 34. Editing Interface
+
+After capture:
+
+```text
+              PHOTO
+
+Exposure       ─────────●──
+Contrast       ──────●─────
+Highlights     ───●────────
+Shadows        ─────────●──
+Temperature    ─────●──────
+Tint           ─────●──────
+Clarity        ───────●────
+Dehaze         ─────●──────
+Stars          ───────●────
+Milky Way      ─────────●──
+Noise          ───●────────
+```
+
+Include:
+
+**Before / After**
+
+and
+
+**Original / Processed**
+
+comparison.
+
+---
+
+# 35. Non-Destructive Editing
+
+Never modify the original RAW data.
+
+Store:
+
+```text
+Original RAW
++
+Capture metadata
++
+Processing parameters
++
+Final rendered image
+```
+
+This allows the user to return to the session later.
+
+---
+
+# 36. Export
+
+Support:
+
+* HEIF
+* JPEG
+* TIFF
+* PNG
+* DNG/RAW where applicable
+
+For professional users:
+
+### Export Processed DNG
+
+Preserve maximum available image information.
+
+Also provide:
+
+**Save Original Frames**
+
+for external astrophotography processing.
+
+---
+
+# 37. Performance Architecture
+
+Use GPU acceleration wherever possible.
+
+### CPU
+
+* Camera management
+* Metadata
+* Session management
+* Control logic
+
+### GPU / Metal
+
+* RAW processing
+* Image registration
+* Stacking
+* Noise reduction
+* Tone mapping
+* Masking
+* Rendering
+
+### Accelerate/vImage
+
+* Resampling
+* Filtering
+* Matrix operations
+* Histogram calculations
+
+Processing should be performed incrementally while capture continues.
+
+---
+
+# 38. Memory Management
+
+Long sessions can generate hundreds or thousands of frames.
+
+Never keep all full-resolution frames uncompressed in RAM.
+
+Use:
+
+```text
+Capture
+ ↓
+Temporary storage
+ ↓
+Tile-based processing
+ ↓
+Accumulation buffer
+ ↓
+Discard processed source frame
+```
+
+Use a persistent session directory.
+
+---
+
+# 39. Failure Handling
+
+If capture is interrupted:
+
+```text
+Capture interrupted.
+
+42 of 60 frames captured.
+
+[PROCESS 42 FRAMES]
+[SAVE SESSION]
+[DISCARD]
+```
+
+If the phone becomes too hot:
+
+```text
+⚠ DEVICE TEMPERATURE HIGH
+
+Capture paused to protect image quality and device.
+```
+
+If storage is low:
+
+```text
+⚠ LOW STORAGE
+
+Estimated remaining:
+8 minutes
+```
+
+---
+
+# 40. Recommended UI Structure
+
+Bottom navigation:
+
+```text
+Camera | Sessions | Gallery | Settings
+```
+
+Camera modes:
+
+```text
+PHOTO
+NIGHT
+ASTRO
+STAR TRAILS
+EXPERT
+```
+
+ASTRO screen:
+
+```text
+┌────────────────────────────┐
+│          LIVE VIEW         │
+│                            │
+│      ✦       ✦            │
+│   ✦       ✦               │
+│          ✦                │
+│                            │
+├────────────────────────────┤
+│ ISO 1600   10.0s   ∞      │
+│                            │
+│ EV    WB    FOCUS          │
+│                            │
+│       ● CAPTURE            │
+│                            │
+│  30 frames • 5 min         │
+└────────────────────────────┘
+```
+
+---
+
+# 41. Expert Mode
+
+Expose advanced controls:
+
+```text
+Lens
+ISO
+Shutter
+Focus
+WB
+EV
+Frame Count
+Interval
+RAW Format
+Stack Algorithm
+Alignment
+Dark Frame
+Sky Mask
+Noise Reduction
+Hot Pixel Removal
+Light Pollution
+Star Enhancement
+```
+
+Expert mode should not hide the complexity from advanced users, but the default Astro mode should remain simple.
+
+---
+
+# 42. Core Processing Pipeline
+
+The final implementation should approximately follow:
+
+```text
+Camera Frame
+      ↓
+RAW Decode
+      ↓
+Black Level / Sensor Calibration
+      ↓
+Lens Correction
+      ↓
+Hot Pixel Detection
+      ↓
+Bad Frame Detection
+      ↓
+Star Detection
+      ↓
+Star Alignment
+      ↓
+Exposure Normalization
+      ↓
+Multi-frame Stack
+      ↓
+Sigma Clipping
+      ↓
+Noise Reduction
+      ↓
+Sky Gradient Removal
+      ↓
+Sky / Foreground Separation
+      ↓
+Exposure Recovery
+      ↓
+White Balance
+      ↓
+Color Processing
+      ↓
+Star Preservation
+      ↓
+Milky Way Enhancement
+      ↓
+Tone Mapping
+      ↓
+Sharpening
+      ↓
+Final Image
+```
+
+---
+
+# 43. Important Image-Processing Principle
+
+The app must follow one fundamental rule:
+
+**Enhance information that exists in the captured data; do not invent astronomical detail.**
+
+Avoid:
+
+* Artificial stars
+* Fake Milky Way structures
+* Excessive sharpening
+* Plastic-looking noise reduction
+* Over-saturated stars
+* AI-generated sky replacement
+
+The application should produce images that remain believable when zoomed to 100%.
+
+---
+
+# 44. MVP
+
+The first version should focus on:
+
+1. Manual ISO
+2. Manual shutter
+3. Manual focus
+4. RAW/ProRAW capture where supported
+5. Multi-frame capture
+6. Star alignment
+7. Stacking
+8. Noise reduction
+9. Exposure recovery
+10. White balance
+11. Light-pollution correction
+12. Milky Way enhancement
+13. RAW + processed export
+
+Do not attempt every astronomy feature in V1.
+
+---
+
+# 45. V2
+
+Add:
+
+* Star-trail mode
+* Sky/foreground separation
+* Dark-frame calibration
+* Automatic star focusing
+* Celestial compass
+* Moon tracking
+* Milky Way planner
+* Advanced light-pollution removal
+* Better frame rejection
+* Deep-sky stacking
+* Session replay
+
+---
+
+# 46. V3
+
+Advanced computational astrophotography:
+
+* Star tracking
+* Automatic celestial alignment
+* Deep-sky object detection
+* Multi-exposure HDR astrophotography
+* Automatic exposure sequencing
+* Automated calibration frames
+* RAW stacking workspace
+* External DNG workflow
+* Astrophotography planning
+* Optional computational enhancement models
+
+---
+
+# 47. Success Criteria
+
+The application should outperform the standard iPhone night camera specifically in:
+
+### Stars
+
+More visible stars with less noise.
+
+### Milky Way
+
+Higher contrast and better color separation.
+
+### Noise
+
+Lower chroma and luminance noise.
+
+### Detail
+
+More recoverable faint detail.
+
+### Dynamic range
+
+Better balance between sky and foreground.
+
+### Naturalness
+
+No obvious computational artifacts.
+
+The most important benchmark is not simply:
+
+**"Does the image look brighter?"**
+
+It is:
+
+**"Can the user see significantly more genuine astronomical information than in a single standard iPhone photograph?"**
+
+# 48. Suggested Product Positioning
+
+Possible names:
+
+* **AstroCam**
+* **NightSky**
+* **Stellar**
+* **AstroRAW**
+* **StarCapture**
+* **DeepSky**
+* **Luma Astro**
+
+The strongest technical differentiator should be:
+
+**Long-exposure computational stacking + RAW astrophotography processing designed specifically for iPhone sensors.**
+
