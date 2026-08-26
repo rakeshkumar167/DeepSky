@@ -36,22 +36,38 @@ public enum HalfFluxDiameter {
         var totalFlux = 0.0
         var sumX = 0.0
         var sumY = 0.0
-        var peakFlux = 0.0
+        var litPixelCount = 0
         for y in 0..<patch.height {
             for x in 0..<patch.width {
                 let f = max(0.0, Double(patch[x, y]) - background)
                 totalFlux += f
                 sumX += f * Double(x)
                 sumY += f * Double(y)
-                peakFlux = max(peakFlux, f)
+                if f > 0 { litPixelCount += 1 }
             }
         }
         guard totalFlux > 0 else { return nil }
 
-        // Reject patches where flux is concentrated in a single pixel (e.g., hot/stuck sensor pixel).
-        // Real stars always have a point-spread function spreading light across multiple pixels.
-        let peakFluxFraction = peakFlux / totalFlux
-        guard peakFluxFraction < 0.3 else { return nil }
+        // Reject patches where the signal is concentrated in essentially one
+        // pixel (e.g. a hot/stuck sensor pixel), by spatial extent rather
+        // than peak share. Peak-share alone (peakFlux / totalFlux < 0.3)
+        // rejects genuinely sharp, well-centred stars too: a Gaussian
+        // landing on a pixel centre can concentrate over 40% of its flux in
+        // the peak pixel at sub-2px FWHM, which is exactly the sharp end of
+        // a focus sweep this metric must not blank out.
+        //
+        // The extent check counts pixels carrying *any* residual signal
+        // above background, not pixels above half the peak. A stuck pixel
+        // is by construction surrounded by pixels reading pure background
+        // (zero residual) — extent 1, always. A real point-spread function
+        // is smooth and never truly reaches zero away from its centre, so
+        // it always lights up several neighbouring pixels — including at
+        // the tightest sigmas this metric needs to resolve (down to ~0.4 px,
+        // far under 1 px FWHM), where a half-peak threshold would in fact
+        // still fail: the immediate neighbour of a pixel-centred sigma-0.4
+        // star sits at ~4% of peak, comfortably below half but still real,
+        // non-zero signal distinguishing it from a defect pixel.
+        guard litPixelCount >= 4 else { return nil }
 
         let cx = sumX / totalFlux
         let cy = sumY / totalFlux

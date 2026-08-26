@@ -3,9 +3,17 @@ import Foundation
 import DeepSkyMetrics
 
 /// Renders a Gaussian star of a given sigma into a square patch.
-private func syntheticStar(size: Int, sigma: Double, background: Float = 0.02) -> LuminancePatch {
+///
+/// `offset` places the star's centre within the central pixel pair:
+/// 0.0 lands it exactly on a pixel centre, 0.5 straddles two pixels
+/// symmetrically (the only position the original tests ever exercised,
+/// since `(size - 1) / 2.0` is always `.5` for the even sizes used here).
+/// Sub-pixel position is what drives the peak-concentration guard in
+/// `HalfFluxDiameter`, so tests that don't vary it can't see bugs in it.
+private func syntheticStar(size: Int, sigma: Double, background: Float = 0.02,
+                           offset: Double = 0.5) -> LuminancePatch {
     var pixels = [Float](repeating: background, count: size * size)
-    let c = Double(size - 1) / 2.0
+    let c = Double(size / 2 - 1) + offset
     for y in 0..<size {
         for x in 0..<size {
             let dx = Double(x) - c, dy = Double(y) - c
@@ -44,6 +52,21 @@ private func syntheticStar(size: Int, sigma: Double, background: Float = 0.02) -
     let dark = HalfFluxDiameter.measure(syntheticStar(size: 64, sigma: 2.0, background: 0.01))!
     let bright = HalfFluxDiameter.measure(syntheticStar(size: 64, sigma: 2.0, background: 0.30))!
     #expect(abs(dark - bright) < 0.5)
+}
+
+@Test func sharpStarsAreMeasurableAtEveryTestedSigmaAndSubPixelOffset() {
+    // The old peakFluxFraction guard blanked out genuinely sharp,
+    // well-centred stars — exactly the sharp end of a focus sweep, where
+    // the metric must work. Covers pixel-centred (0.0) and straddling
+    // (0.5) sub-pixel positions, since position is what drives the guard.
+    let sigmas = [0.4, 0.6, 0.8, 1.0, 2.0, 3.0]
+    for sigma in sigmas {
+        for offset in [0.0, 0.5] {
+            let patch = syntheticStar(size: 32, sigma: sigma, offset: offset)
+            let hfd = HalfFluxDiameter.measure(patch)
+            #expect(hfd != nil, "sigma=\(sigma) offset=\(offset) should be measurable")
+        }
+    }
 }
 
 @Test func rejectsSharpSinglePixelSpike() {
