@@ -11,8 +11,23 @@ public struct StackResult: Sendable {
     public let singleFrame: FloatImage
     public let framesUsed: Int
     public let framesFailed: Int
+    /// Spatial σ over a patch. Retained for diagnostics only — it is dominated
+    /// by scene structure (about 92% on a real session), so it cannot see
+    /// stacking work. Never present it as the result.
     public let noiseSingle: Double
     public let noiseStacked: Double
+
+    /// Noise measured from differences between frames, which cancels scene
+    /// structure. This is the honest measurement and the one to show.
+    public let temporalNoiseSingle: Double?
+    public let temporalNoiseStacked: Double?
+
+    /// How much noise actually fell, by the temporal measurement.
+    public var temporalImprovement: Double? {
+        guard let single = temporalNoiseSingle, let stacked = temporalNoiseStacked,
+              stacked > 0 else { return nil }
+        return single / stacked
+    }
     /// Per-frame translation removed before stacking, in pixels at the
     /// processing resolution. Empty when alignment was disabled.
     public let offsets: [Offset]
@@ -64,6 +79,10 @@ public enum StackPipeline {
         var reference: FloatImage?
         var failed = 0
         var offsets: [Offset] = []
+        /// Aligned frames retained for the temporal measurement, which needs
+        /// to difference them. Downscaled copies, so this stays modest even
+        /// for a long session.
+        var alignedFrames: [FloatImage] = []
 
         for (i, url) in frameURLs.enumerated() {
             defer { progress?(i + 1, frameURLs.count) }
@@ -91,7 +110,7 @@ public enum StackPipeline {
                 }
             }
 
-            if stacker?.add(frame) == false { failed += 1 }
+            if stacker?.add(frame) == false { failed += 1 } else { alignedFrames.append(frame) }
         }
 
         guard let stacker, let reference, let stacked = stacker.result() else {
@@ -112,6 +131,10 @@ public enum StackPipeline {
             framesFailed: failed,
             noiseSingle: NoiseMeasurement.standardDeviation(reference, in: region),
             noiseStacked: NoiseMeasurement.standardDeviation(stacked, in: region),
+            temporalNoiseSingle: alignedFrames.count >= 2
+                ? TemporalNoise.perFrame(alignedFrames[0], alignedFrames[1], in: region)
+                : nil,
+            temporalNoiseStacked: TemporalNoise.ofStack(alignedFrames, in: region),
             offsets: offsets)
     }
 }

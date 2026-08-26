@@ -105,19 +105,27 @@ struct StackResultScreen: View {
             .multilineTextAlignment(.center)
 
         VStack(spacing: DS.xs) {
-            Text(String(format: "%.2f× less noise", result.improvementFactor))
+            // The temporal measurement is the honest one: spatial sigma over a
+            // patch is dominated by scene structure and cannot see stacking
+            // work at all.
+            Text(String(format: "%.2f× less noise", result.temporalImprovement ?? 0))
                 .readout(26, weight: .bold)
                 .foregroundStyle(improvementColour(result))
             Text(String(format: "ideal for %d frames is %.2f×",
                         result.framesUsed, result.expectedImprovement))
                 .font(.system(size: 11))
                 .foregroundStyle(DS.secondaryText(nightMode))
+            if result.maxDriftPixels > 0 {
+                Text("aligned up to \(result.maxDriftPixels)px of drift")
+                    .font(.system(size: 11))
+                    .foregroundStyle(DS.secondaryText(nightMode))
+            }
         }
         .padding(.top, DS.sm)
 
         // A result below 1.0 is not a rendering quirk — it means the frames
         // moved, and the user should be told why rather than left to wonder.
-        if result.improvementFactor < 1.0 {
+        if let improvement = result.temporalImprovement, improvement < 1.0 {
             explanation(
                 icon: "exclamationmark.triangle.fill",
                 level: 1,
@@ -175,7 +183,8 @@ struct StackResultScreen: View {
     }
 
     private func improvementColour(_ result: StackResult) -> Color {
-        result.improvementFactor >= 1.0 ? DS.accent(nightMode) : DS.status(1, night: nightMode)
+        (result.temporalImprovement ?? 0) >= 1.0
+            ? DS.accent(nightMode) : DS.status(1, night: nightMode)
     }
 
     private func stack() async {

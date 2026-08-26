@@ -66,6 +66,12 @@ public actor AVCaptureDriver: CameraDevice {
     /// measurement — worth revisiting once real sessions exist.
     static let autoExposureSettleSeconds = 1.5
 
+    /// Extra settle after manual exposure is applied, before the first capture.
+    /// The completion handler reports that settings were accepted, not that the
+    /// sensor has finished converging — measured on a real session, the first
+    /// frame was still 83% darker than its successors without this.
+    static let exposureSettleSeconds = 0.5
+
     private let session = AVCaptureSession()
     private let output = AVCapturePhotoOutput()
     private let device: AVCaptureDevice
@@ -167,9 +173,6 @@ public actor AVCaptureDriver: CameraDevice {
             throw CaptureError.isoOutOfRange(requested: settings.iso, max: format.maxISO)
         }
 
-        try device.lockForConfiguration()
-        defer { device.unlockForConfiguration() }
-
         // Clamp against the ACTIVE format, which can differ from the probed one
         // we validated against — the session preset may have selected another.
         let active = device.activeFormat
@@ -177,24 +180,51 @@ public actor AVCaptureDriver: CameraDevice {
                                            CMTimeGetSeconds(active.maxExposureDuration)),
                               preferredTimescale: 1_000_000)
         let iso = min(max(settings.iso, active.minISO), active.maxISO)
-        device.setExposureModeCustom(duration: duration, iso: iso) { _ in }
 
-        if device.isFocusModeSupported(.locked) {
-            device.setFocusModeLocked(lensPosition: settings.lensPosition) { _ in }
+        do {
+            try device.lockForConfiguration()
+            defer { device.unlockForConfiguration() }
+
+            if device.isFocusModeSupported(.locked) {
+                device.setFocusModeLocked(lensPosition: settings.lensPosition) { _ in }
+            }
+
+            if device.isWhiteBalanceModeSupported(.locked) {
+                let temperature = AVCaptureDevice.WhiteBalanceTemperatureAndTintValues(
+                    temperature: Float(settings.whiteBalanceKelvin), tint: 0)
+                var gains = device.deviceWhiteBalanceGains(for: temperature)
+                // Gains below 1 or above the device maximum throw an exception
+                // rather than returning an error, so clamp before applying.
+                let maxGain = device.maxWhiteBalanceGain
+                gains.redGain = min(max(1, gains.redGain), maxGain)
+                gains.greenGain = min(max(1, gains.greenGain), maxGain)
+                gains.blueGain = min(max(1, gains.blueGain), maxGain)
+                device.setWhiteBalanceModeLocked(with: gains) { _ in }
+            }
         }
 
-        if device.isWhiteBalanceModeSupported(.locked) {
-            let temperature = AVCaptureDevice.WhiteBalanceTemperatureAndTintValues(
-                temperature: Float(settings.whiteBalanceKelvin), tint: 0)
-            var gains = device.deviceWhiteBalanceGains(for: temperature)
-            // Gains below 1 or above the device maximum throw an exception
-            // rather than returning an error, so clamp before applying.
-            let maxGain = device.maxWhiteBalanceGain
-            gains.redGain = min(max(1, gains.redGain), maxGain)
-            gains.greenGain = min(max(1, gains.greenGain), maxGain)
-            gains.blueGain = min(max(1, gains.blueGain), maxGain)
-            device.setWhiteBalanceModeLocked(with: gains) { _ in }
+        // Await the exposure change actually taking effect.
+        //
+        // Ignoring this handler cost a whole frame: capture began while the
+        // sensor was still transitioning out of auto-exposure, and the first
+        // frame of a real session came out 83% darker than the rest. It then
+        // poisoned every measurement that used it as the reference.
+        await withCheckedContinuation { (c: CheckedContinuation<Void, Never>) in
+            do {
+                try device.lockForConfiguration()
+                device.setExposureModeCustom(duration: duration, iso: iso) { _ in
+                    c.resume()
+                }
+                device.unlockForConfiguration()
+            } catch {
+                c.resume()
+            }
         }
+
+        // The completion handler fires when the settings are applied, not when
+        // the sensor has finished converging on them. A short settle after it
+        // covers the remainder.
+        try? await Task.sleep(for: .seconds(Self.exposureSettleSeconds))
 
         applied = settings
     }
