@@ -10,6 +10,7 @@ let package = Package(
         .library(name: "DeepSkyMetrics", targets: ["DeepSkyMetrics"]),
         .library(name: "DeepSkySession", targets: ["DeepSkySession"]),
         .library(name: "DeepSkySynthetic", targets: ["DeepSkySynthetic"]),
+        .library(name: "DeepSkyAVCapture", targets: ["DeepSkyAVCapture"]),
     ],
     targets: [
         .target(name: "DeepSkyCore"),
@@ -18,6 +19,9 @@ let package = Package(
         .target(name: "DeepSkySession",
                 dependencies: ["DeepSkyCore", "DeepSkyCapture", "DeepSkyMetrics"]),
         .target(name: "DeepSkySynthetic", dependencies: ["DeepSkyCore", "DeepSkyCapture"]),
+        // iOS-only: the single target permitted to import AVFoundation.
+        // Its contents are #if os(iOS) guarded so the macOS test build stays green.
+        .target(name: "DeepSkyAVCapture", dependencies: ["DeepSkyCore", "DeepSkyCapture"]),
         .testTarget(name: "DeepSkyCoreTests", dependencies: ["DeepSkyCore"]),
         .testTarget(name: "DeepSkyMetricsTests", dependencies: ["DeepSkyMetrics", "DeepSkyCore"]),
         .testTarget(name: "DeepSkySessionTests",

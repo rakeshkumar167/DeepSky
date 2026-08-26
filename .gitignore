@@ -36,3 +36,6 @@ fastlane/report.xml
 Sessions/
 *.dng
 *.xip
+
+# Probe output (device-specific fixtures are committed deliberately, not automatically)
+capabilities-*.json
