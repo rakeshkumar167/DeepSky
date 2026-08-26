@@ -827,6 +827,7 @@ git commit -m "feat: add session record types with closed flag set"
 
 **Files:**
 - Create: `Packages/DeepSkyKit/Sources/DeepSkySession/SessionStore.swift`
+- Delete: `Packages/DeepSkyKit/Sources/DeepSkySession/DeepSkySession.swift` (the Task 1 placeholder — the target now has a real file, so the placeholder `DeepSkySessionModule` enum is dead code)
 - Test: `Packages/DeepSkyKit/Tests/DeepSkySessionTests/SessionStoreTests.swift`
 
 **Interfaces:**
@@ -845,7 +846,7 @@ import DeepSkyCore
 
 private func makeManifest() -> SessionManifest {
     SessionManifest(
-        id: "test-session", name: "Milky Way",
+        id: UUID().uuidString, name: "Milky Way",
         startedAt: Date(timeIntervalSince1970: 776000000),
         plan: CapturePlan(sensorExposure: ShutterSpeed(seconds: 1.0),
                           intervalSeconds: 0.05, frameCount: 60),
@@ -1504,6 +1505,7 @@ git commit -m "feat: add storage and thermal capture policy"
 **Files:**
 - Create: `Packages/DeepSkyKit/Sources/DeepSkyCapture/CameraDevice.swift`
 - Create: `Packages/DeepSkyKit/Sources/DeepSkySynthetic/SyntheticDriver.swift`
+- Delete: `Packages/DeepSkyKit/Sources/DeepSkyCapture/DeepSkyCapture.swift` and `Packages/DeepSkyKit/Sources/DeepSkySynthetic/DeepSkySynthetic.swift` (the Task 1 placeholders — both targets now have real files, so the `*Module` enums are dead code)
 - Test: `Packages/DeepSkyKit/Tests/DeepSkySyntheticTests/SyntheticDriverTests.swift`
 
 **Interfaces:**
@@ -1604,7 +1606,7 @@ Expected: FAIL — "cannot find 'CaptureSettings' in scope".
 
 - [ ] **Step 3: Write minimal implementation**
 
-`Sources/DeepSkyCapture/CameraDevice.swift` — replace the placeholder file:
+`Sources/DeepSkyCapture/CameraDevice.swift` (new file; delete the placeholder `DeepSkyCapture.swift`):
 
 ```swift
 import Foundation
@@ -1662,7 +1664,7 @@ public protocol CameraDevice: Actor {
 }
 ```
 
-`Sources/DeepSkySynthetic/SyntheticDriver.swift` — replace the placeholder file:
+`Sources/DeepSkySynthetic/SyntheticDriver.swift` (new file; delete the placeholder `DeepSkySynthetic.swift`):
 
 ```swift
 import Foundation
