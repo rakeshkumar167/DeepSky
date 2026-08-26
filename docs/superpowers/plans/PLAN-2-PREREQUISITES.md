@@ -9,7 +9,7 @@ blocks or shapes Plan 2.
 
 ---
 
-## 1. BLOCKING — the HFD hot-pixel guard is a no-op on real sensor data
+## 1. ~~BLOCKING~~ RESOLVED 2026-08-26 — the HFD hot-pixel guard was a no-op on real sensor data
 
 `Sources/DeepSkyMetrics/HalfFluxDiameter.swift` rejects hot/stuck pixels with:
 
@@ -58,6 +58,22 @@ Behaviour against the cases that matter:
   sigma; rejected — which today's implementation does NOT do.
 
 **Add a noisy-background regression test at the same time**, or this gap silently returns.
+
+### RESOLVED
+
+Implemented as described. `HalfFluxDiameter` now estimates noise from the patch
+(`sigma = 1.4826 * MAD`, floored at 1e-6) and requires >= 4 pixels within Chebyshev distance 2 of
+the peak whose residual exceeds `5 * sigma`.
+
+Verified by mutation test rather than assertion: with the old guard restored,
+`rejectsHotPixelOnNoisyBackground` returns **47.12** instead of `nil` — so the new test genuinely
+catches the defect. Worth noting the failure mode is not what the noise-free analysis predicted: on
+a *flat* background the old code returned 0.0 ("perfect focus"), but on a *noisy* one the noise
+dominates total flux across the patch and it returns a large meaningless number instead. Both are
+wrong in the same way that matters — a focus reading for a patch containing no star.
+
+Four regression tests added (`rejectsHotPixelOnNoisyBackground`, `acceptsRealStarOnNoisyBackground`,
+`noiseEstimateTracksActualNoiseLevel`, `noiseEstimateFloorsOnAPerfectlyFlatPatch`). Suite: 90 tests.
 
 ## 2. BLOCKING — `LuminancePatch.init` traps at the live-buffer boundary
 
