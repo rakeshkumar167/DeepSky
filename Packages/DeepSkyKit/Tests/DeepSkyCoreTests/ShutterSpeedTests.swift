@@ -37,3 +37,11 @@ import DeepSkyCore
     #expect(ShutterSpeed(seconds: Double.nan).displayLabel == "N/A")
     #expect(ShutterSpeed(seconds: Double.infinity).displayLabel == "N/A")
 }
+
+@Test func handlesExtremelyTinyPositiveSecondsWithoutTrapping() {
+    // Below ~1.08e-19 the reciprocal exceeds Int.max and `Int(reciprocal)`
+    // traps. ShutterLadder can feed a probe-supplied minExposureSeconds
+    // straight into this, so it must degrade gracefully instead.
+    #expect(ShutterSpeed(seconds: 1e-30).displayLabel == "N/A")
+    #expect(ShutterSpeed(seconds: .leastNonzeroMagnitude).displayLabel == "N/A")
+}

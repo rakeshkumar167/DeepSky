@@ -18,16 +18,18 @@ public enum CapturePolicy {
     private static func requiredBytes(frames: Int, bytesPerFrame: Int) -> Int64 {
         let raw = Double(frames) * Double(bytesPerFrame) * headroomMultiplier
 
-        // Check if the raw value would overflow when converted to Int64.
-        // We need to account for adding reserveBytes after the conversion.
-        let maxSafeDouble = Double(Int64.max - reserveBytes)
-
-        // Handle non-finite values or values that would overflow
-        if !raw.isFinite || raw > maxSafeDouble {
-            return Int64.max
+        // Close both ends explicitly rather than trusting a rounded Double
+        // comparison: `Int64(exactly:)` and `addingReportingOverflow` fail
+        // cleanly instead of trapping, however `raw` lands. A negative
+        // frame count still needs the reserve, so it clamps to
+        // `reserveBytes` rather than to a negative requirement.
+        guard raw.isFinite, raw >= 0,
+              let base = Int64(exactly: raw.rounded(.down))
+        else {
+            return raw.isFinite && raw < 0 ? reserveBytes : Int64.max
         }
-
-        return Int64(raw) + reserveBytes
+        let (sum, overflow) = base.addingReportingOverflow(reserveBytes)
+        return overflow ? Int64.max : sum
     }
 
     public static func storageRequirement(plan: CapturePlan, bytesPerFrame: Int) -> Int64 {

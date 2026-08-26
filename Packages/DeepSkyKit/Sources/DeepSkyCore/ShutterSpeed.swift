@@ -11,7 +11,11 @@ public struct ShutterSpeed: Sendable, Hashable, Codable, Comparable {
     /// longer read as decimals ("2.0s"). Astrophotographers work in the
     /// second-and-longer range, where reciprocals are unreadable.
     public var displayLabel: String {
-        guard seconds.isFinite && seconds > 0.0 else {
+        // The magnitude floor guards the reciprocal below: for seconds
+        // under ~1e-19 the reciprocal exceeds Int.max and `Int(reciprocal)`
+        // traps. 1e-9 is far below any real shutter speed, so it costs
+        // nothing in the valid range while closing the crash.
+        guard seconds.isFinite && seconds >= 1e-9 else {
             return "N/A"
         }
         if seconds >= 1.0 {

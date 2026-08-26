@@ -69,6 +69,35 @@ private let plan60 = CapturePlan(sensorExposure: ShutterSpeed(seconds: 1.0),
     #expect(result == .proceed)
 }
 
+@Test func negativeFrameCountClampsToReserveRatherThanTrapping() {
+    // frames: Int.min makes `raw` a huge negative Double. It must not fall
+    // through to `Int64(raw)`, which traps — and a negative frame count
+    // still needs the reserve, so it clamps to reserveBytes rather than a
+    // negative requirement.
+    let plan = CapturePlan(sensorExposure: ShutterSpeed(seconds: 1.0),
+                           intervalSeconds: 0.05, frameCount: Int.min)
+    let result = CapturePolicy.storageRequirement(plan: plan, bytesPerFrame: 25 * mb)
+    #expect(result == Int64(500 * mb))
+}
+
+@Test func decideWithNegativeFramesRemainingDoesNotCrash() {
+    let result = CapturePolicy.decide(thermal: .nominal, freeBytes: Int64.max,
+                                      bytesPerFrame: 25 * mb, framesRemaining: Int.min)
+    #expect(result == .proceed)
+}
+
+@Test func largeBytesPerFrameClampsToInt64MaxRatherThanOverflowing() {
+    // bytesPerFrame large enough that headroom pushes `raw` up near the
+    // true Int64.max boundary. The old guard compared against
+    // `Double(Int64.max - reserveBytes)`, which rounds up past the real
+    // boundary, letting a value through that then overflowed the checked
+    // `Int64(raw) + reserveBytes` addition and trapped.
+    let plan = CapturePlan(sensorExposure: ShutterSpeed(seconds: 1.0),
+                           intervalSeconds: 0.05, frameCount: Int.max)
+    let result = CapturePolicy.storageRequirement(plan: plan, bytesPerFrame: Int.max)
+    #expect(result == Int64.max)
+}
+
 @Test func storageRequirementAndDecideBoundaryAgree() {
     // storageRequirement and decide must use the same calculation.
     // When framesRemaining == plan.frameCount, the requirement should match.
