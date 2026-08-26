@@ -37,5 +37,6 @@ Sessions/
 *.dng
 *.xip
 
-# Probe output (device-specific fixtures are committed deliberately, not automatically)
-capabilities-*.json
+# Probe output landing in the working tree. Real device profiles are committed
+# deliberately under Tests/DeepSkyCoreTests/Fixtures/, not picked up from here.
+/capabilities-*.json

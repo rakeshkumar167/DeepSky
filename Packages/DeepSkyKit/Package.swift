@@ -22,7 +22,8 @@ let package = Package(
         // iOS-only: the single target permitted to import AVFoundation.
         // Its contents are #if os(iOS) guarded so the macOS test build stays green.
         .target(name: "DeepSkyAVCapture", dependencies: ["DeepSkyCore", "DeepSkyCapture"]),
-        .testTarget(name: "DeepSkyCoreTests", dependencies: ["DeepSkyCore"]),
+        .testTarget(name: "DeepSkyCoreTests", dependencies: ["DeepSkyCore"],
+                    resources: [.copy("Fixtures")]),
         .testTarget(name: "DeepSkyMetricsTests", dependencies: ["DeepSkyMetrics", "DeepSkyCore"]),
         .testTarget(name: "DeepSkySessionTests",
                     dependencies: ["DeepSkySession", "DeepSkyCore", "DeepSkyCapture", "DeepSkySynthetic"]),
