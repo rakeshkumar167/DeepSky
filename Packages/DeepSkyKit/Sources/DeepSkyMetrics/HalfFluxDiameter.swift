@@ -36,15 +36,22 @@ public enum HalfFluxDiameter {
         var totalFlux = 0.0
         var sumX = 0.0
         var sumY = 0.0
+        var peakFlux = 0.0
         for y in 0..<patch.height {
             for x in 0..<patch.width {
                 let f = max(0.0, Double(patch[x, y]) - background)
                 totalFlux += f
                 sumX += f * Double(x)
                 sumY += f * Double(y)
+                peakFlux = max(peakFlux, f)
             }
         }
         guard totalFlux > 0 else { return nil }
+
+        // Reject patches where flux is concentrated in a single pixel (e.g., hot/stuck sensor pixel).
+        // Real stars always have a point-spread function spreading light across multiple pixels.
+        let peakFluxFraction = peakFlux / totalFlux
+        guard peakFluxFraction < 0.3 else { return nil }
 
         let cx = sumX / totalFlux
         let cy = sumY / totalFlux
