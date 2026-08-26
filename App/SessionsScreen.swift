@@ -80,6 +80,15 @@ struct SessionSummary: Identifiable {
 struct SessionsScreen: View {
     let nightMode: Bool
     @State private var sessions: [SessionSummary] = []
+    @State private var pendingDeletion: SessionSummary?
+
+    private var totalBytes: Int64 { sessions.reduce(0) { $0 + $1.bytes } }
+
+    private var freeBytes: Int64 {
+        let values = try? URL.documentsDirectory.resourceValues(
+            forKeys: [.volumeAvailableCapacityForImportantUsageKey])
+        return values?.volumeAvailableCapacityForImportantUsage ?? 0
+    }
 
     var body: some View {
         NavigationStack {
@@ -88,10 +97,55 @@ struct SessionsScreen: View {
             }
             .background(DS.background)
             .navigationTitle("Sessions")
+            .safeAreaInset(edge: .bottom) { storageBar }
         }
         .tint(DS.accent(nightMode))
         .onAppear { sessions = SessionSummary.loadAll() }
         .refreshable { sessions = SessionSummary.loadAll() }
+        .confirmationDialog(
+            "Delete this session?",
+            isPresented: Binding(get: { pendingDeletion != nil },
+                                 set: { if !$0 { pendingDeletion = nil } }),
+            titleVisibility: .visible
+        ) {
+            Button("Delete \(ByteCountFormatStyle().format(pendingDeletion?.bytes ?? 0))",
+                   role: .destructive) {
+                if let target = pendingDeletion { delete(target) }
+                pendingDeletion = nil
+            }
+            Button("Cancel", role: .cancel) { pendingDeletion = nil }
+        } message: {
+            // Naming what is lost, because RAW frames cannot be re-shot — the
+            // sky has moved on.
+            Text("\(pendingDeletion?.name ?? "") · \(pendingDeletion?.framesWritten ?? 0) RAW frames will be permanently deleted. This cannot be undone.")
+        }
+    }
+
+    /// Storage is not incidental here: a 19-frame session is roughly 380MB, so
+    /// a few nights fills a phone.
+    private var storageBar: some View {
+        HStack {
+            Label(ByteCountFormatStyle().format(totalBytes), systemImage: "internaldrive")
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(DS.primaryText(nightMode))
+            Text("in \(sessions.count) session\(sessions.count == 1 ? "" : "s")")
+                .font(.system(size: 12))
+                .foregroundStyle(DS.secondaryText(nightMode))
+            Spacer()
+            Text("\(ByteCountFormatStyle().format(freeBytes)) free")
+                .font(.system(size: 12))
+                .foregroundStyle(freeBytes < 1_000_000_000
+                                 ? DS.status(1, night: nightMode)
+                                 : DS.secondaryText(nightMode))
+        }
+        .padding(.horizontal, DS.md)
+        .padding(.vertical, DS.sm)
+        .background(.ultraThinMaterial)
+    }
+
+    private func delete(_ session: SessionSummary) {
+        try? FileManager.default.removeItem(at: session.url)
+        sessions = SessionSummary.loadAll()
     }
 
     private var emptyState: some View {
@@ -113,6 +167,11 @@ struct SessionsScreen: View {
             ForEach(sessions) { session in
                 NavigationLink { SessionDetail(session: session, nightMode: nightMode) }
                 label: { SessionRow(session: session, nightMode: nightMode) }
+                    .swipeActions(edge: .trailing) {
+                        Button(role: .destructive) { pendingDeletion = session } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
             }
             .listRowBackground(DS.surface)
         }

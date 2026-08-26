@@ -13,8 +13,21 @@ struct StackResultScreen: View {
     /// Fraction of the session's frames flagged for movement, from the manifest.
     let motionFlaggedFraction: Double
 
+    /// How each image is rendered for display.
+    enum StretchMode: String, CaseIterable {
+        /// Each image pushed as far as its own noise allows. This is what
+        /// stacking actually buys you — averaging cannot add brightness, but a
+        /// quieter image tolerates a far harder stretch, and that is where the
+        /// faint detail appears.
+        case auto = "Autostretch"
+        /// Both through one identical curve. Isolates noise reduction, at the
+        /// cost of the stack looking no brighter than a single frame.
+        case matched = "Matched"
+    }
+
     @State private var result: StackResult?
     @State private var showingStacked = true
+    @State private var stretch: StretchMode = .auto
     @State private var progress = 0.0
     @State private var errorMessage: String?
 
@@ -65,7 +78,8 @@ struct StackResultScreen: View {
     @ViewBuilder
     private func comparison(_ result: StackResult) -> some View {
         let image = showingStacked ? result.stacked : result.singleFrame
-        if let cg = GrayImageRenderer.cgImage(ToneMapper.map(image)) {
+        let rendered = stretch == .auto ? AutoStretch.map(image) : ToneMapper.map(image)
+        if let cg = GrayImageRenderer.cgImage(rendered) {
             Image(decorative: cg, scale: 1, orientation: .up)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
@@ -77,6 +91,18 @@ struct StackResultScreen: View {
             Text("\(result.framesUsed) stacked").tag(true)
         }
         .pickerStyle(.segmented)
+
+        Picker("", selection: $stretch) {
+            ForEach(StretchMode.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+        }
+        .pickerStyle(.segmented)
+
+        Text(stretch == .auto
+             ? "Each image stretched as far as its own noise allows — averaging cannot add brightness, but a cleaner image survives a harder stretch, and that is where faint detail appears."
+             : "Both images through one identical curve. Isolates noise reduction, so the stack will not look brighter.")
+            .font(.system(size: 11))
+            .foregroundStyle(DS.secondaryText(nightMode))
+            .multilineTextAlignment(.center)
 
         VStack(spacing: DS.xs) {
             Text(String(format: "%.2f× less noise", result.improvementFactor))
@@ -115,10 +141,14 @@ struct StackResultScreen: View {
                 body: "They were skipped. The rest of the session stacked normally.")
         }
 
-        Text("Both images use the same tone curve, so the comparison is honest.")
-            .font(.system(size: 11))
-            .foregroundStyle(DS.secondaryText(nightMode))
-            .padding(.top, DS.xs)
+        if stretch == .auto, let stacked = stretchGain(result.stacked),
+           let single = stretchGain(result.singleFrame), single > 0 {
+            Text(String(format: "The stack tolerates %.1f× the stretch of a single frame.",
+                        stacked / single))
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(DS.secondaryText(nightMode))
+                .padding(.top, DS.xs)
+        }
     }
 
     private func explanation(icon: String, level: Int, title: String, body: String) -> some View {
@@ -137,6 +167,11 @@ struct StackResultScreen: View {
         }
         .padding(DS.md)
         .background(DS.surface, in: RoundedRectangle(cornerRadius: DS.radius))
+    }
+
+    private func stretchGain(_ image: FloatImage) -> Double? {
+        let gain = AutoStretch.parameters(for: image).gain
+        return gain.isFinite ? Double(gain) : nil
     }
 
     private func improvementColour(_ result: StackResult) -> Color {

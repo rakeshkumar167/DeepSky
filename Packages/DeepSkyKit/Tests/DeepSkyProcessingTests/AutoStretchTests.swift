@@ -1,0 +1,123 @@
+import Testing
+import Foundation
+@testable import DeepSkyProcessing
+
+private struct Noise {
+    var state: UInt64
+    init(seed: UInt64) { state = seed &* 6364136223846793005 &+ 1442695040888963407 | 1 }
+    mutating func unit() -> Double {
+        state ^= state << 13; state ^= state >> 7; state ^= state << 17
+        return Double(state >> 11) / Double(1 << 53)
+    }
+    mutating func gaussian(_ sigma: Double) -> Double {
+        let u1 = max(unit(), 1e-12), u2 = unit()
+        return sigma * (-2 * log(u1)).squareRoot() * cos(2 * .pi * u2)
+    }
+}
+
+private func noisyField(size: Int, level: Float, sigma: Double, seed: UInt64) -> FloatImage {
+    var noise = Noise(seed: seed)
+    let pixels = (0..<(size * size)).map { _ in level + Float(noise.gaussian(sigma)) }
+    return FloatImage(width: size, height: size, pixels: pixels)!
+}
+
+/// A faint feature sitting just above the background — the thing stacking is
+/// supposed to make visible.
+private func fieldWithFaintDetail(size: Int, level: Float, sigma: Double,
+                                  featureAmplitude: Float, seed: UInt64) -> FloatImage {
+    var noise = Noise(seed: seed)
+    var pixels = [Float]()
+    pixels.reserveCapacity(size * size)
+    for y in 0..<size {
+        for x in 0..<size {
+            let inFeature = x >= size / 2
+            let base = level + (inFeature ? featureAmplitude : 0)
+            pixels.append(base + Float(noise.gaussian(sigma)))
+        }
+    }
+    return FloatImage(width: size, height: size, pixels: pixels)!
+}
+
+struct AutoStretchTests {
+    @Test func noiseSigmaTracksTheActualNoiseLevel() {
+        let quiet = noisyField(size: 128, level: 0.2, sigma: 0.002, seed: 1)
+        let loud = noisyField(size: 128, level: 0.2, sigma: 0.02, seed: 1)
+        #expect(AutoStretch.noiseSigma(loud) > AutoStretch.noiseSigma(quiet) * 5)
+    }
+
+    /// THE point of this type. A cleaner image must receive a stronger stretch,
+    /// because that is the mechanism by which stacking reveals faint detail —
+    /// not by adding brightness, which averaging cannot do.
+    @Test func cleanerImageReceivesAStrongerStretch() {
+        let noisy = noisyField(size: 128, level: 0.2, sigma: 0.02, seed: 5)
+        let clean = noisyField(size: 128, level: 0.2, sigma: 0.005, seed: 5)
+
+        let noisyGain = AutoStretch.parameters(for: noisy).gain
+        let cleanGain = AutoStretch.parameters(for: clean).gain
+
+        #expect(cleanGain > noisyGain * 2,
+                "clean gain \(cleanGain) should far exceed noisy gain \(noisyGain)")
+    }
+
+    /// The user-visible consequence: faint detail that is buried in a noisy frame
+    /// becomes separable once the image is clean enough to stretch harder.
+    @Test func faintDetailBecomesMoreSeparableInACleanerImage() {
+        let amplitude: Float = 0.004
+        let noisy = fieldWithFaintDetail(size: 128, level: 0.2, sigma: 0.02,
+                                         featureAmplitude: amplitude, seed: 11)
+        let clean = fieldWithFaintDetail(size: 128, level: 0.2, sigma: 0.004,
+                                         featureAmplitude: amplitude, seed: 11)
+
+        func featureContrast(_ image: FloatImage) -> Double {
+            let stretched = AutoStretch.map(image)
+            var left = [Double](), right = [Double]()
+            for y in 0..<stretched.height {
+                for x in 0..<stretched.width {
+                    (x >= stretched.width / 2 ? { right.append(Double(stretched[x, y])) }
+                                              : { left.append(Double(stretched[x, y])) })()
+                }
+            }
+            let meanLeft = left.reduce(0, +) / Double(left.count)
+            let meanRight = right.reduce(0, +) / Double(right.count)
+            return abs(meanRight - meanLeft)
+        }
+
+        #expect(featureContrast(clean) > featureContrast(noisy),
+                "the same faint feature should read stronger in the cleaner image")
+    }
+
+    @Test func backgroundLandsNearTheTarget() {
+        let image = noisyField(size: 128, level: 0.2, sigma: 0.01, seed: 3)
+        let stretched = AutoStretch.map(image)
+        let sorted = stretched.pixels.sorted()
+        let median = sorted[sorted.count / 2]
+        #expect(abs(median - AutoStretch.targetBackground) < 0.08,
+                "background landed at \(median), target \(AutoStretch.targetBackground)")
+    }
+
+    @Test func outputStaysInRange() {
+        let image = noisyField(size: 64, level: 0.2, sigma: 0.01, seed: 9)
+        let stretched = AutoStretch.map(image)
+        #expect(stretched.pixels.allSatisfy { $0 >= 0 && $0 <= 1 })
+        #expect(stretched.pixels.allSatisfy { $0.isFinite })
+    }
+
+    @Test func isDeterministic() {
+        let image = noisyField(size: 32, level: 0.2, sigma: 0.01, seed: 4)
+        #expect(AutoStretch.map(image).pixels == AutoStretch.map(image).pixels)
+    }
+
+    @Test func isMonotonic() {
+        let ramp = FloatImage(width: 32, height: 32,
+                              pixels: (0..<1024).map { Float($0) / 1023 })!
+        let stretched = AutoStretch.map(ramp)
+        for i in 1..<stretched.pixels.count {
+            #expect(stretched.pixels[i] >= stretched.pixels[i - 1] - 1e-6)
+        }
+    }
+
+    @Test func handlesAUniformImageWithoutProducingNaN() {
+        let flat = FloatImage(width: 16, height: 16, pixels: [Float](repeating: 0.3, count: 256))!
+        #expect(AutoStretch.map(flat).pixels.allSatisfy { $0.isFinite })
+    }
+}
