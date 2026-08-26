@@ -2,31 +2,14 @@ import Testing
 import Foundation
 @testable import DeepSkyProcessing
 
-/// Real DNGs are ~19MB each and are never committed, so these tests skip when
-/// no exported session is present. The property that decides whether stacking
-/// works — √N noise reduction — is proven hermetically in FrameStackerTests
-/// and does not depend on any of this.
-func sampleDNGs() -> [URL] {
-    let downloads = FileManager.default.homeDirectoryForCurrentUser
-        .appendingPathComponent("Downloads")
-    guard let entries = try? FileManager.default.contentsOfDirectory(
-        at: downloads, includingPropertiesForKeys: nil) else { return [] }
-    for dir in entries where dir.lastPathComponent.contains("-astro-") {
-        let frames = dir.appendingPathComponent("frames")
-        if let dngs = try? FileManager.default.contentsOfDirectory(
-            at: frames, includingPropertiesForKeys: nil) {
-            return dngs.filter { $0.pathExtension.lowercased() == "dng" }
-                .sorted { $0.lastPathComponent < $1.lastPathComponent }
-        }
-    }
-    return []
-}
+/// Real DNGs are ~19MB each and are never committed, so these tests are gated
+/// on a trait. `#require` FAILS rather than skips in Swift Testing, so gating
+/// in the body would turn "no session present" into a red suite.
 
-@Test func decodesARealProRAWFrame() throws {
-    let dngs = sampleDNGs()
-    try #require(!dngs.isEmpty, "no exported session found — skipping")
-
-    let image = try RAWDecoder.decodeLuminance(contentsOf: dngs[0], maxDimension: 512)
+@Test(.enabled(if: SampleSession.exists()))
+func decodesARealProRAWFrame() throws {
+    let image = try RAWDecoder.decodeLuminance(
+        contentsOf: SampleSession.frames()[0], maxDimension: 512)
     #expect(image.width > 0 && image.height > 0)
     #expect(image.width <= 512 && image.height <= 512)
     #expect(image.pixels.allSatisfy { $0.isFinite })
@@ -34,19 +17,17 @@ func sampleDNGs() -> [URL] {
     #expect(Set(image.pixels.map { ($0 * 1000).rounded() }).count > 10)
 }
 
-@Test func decodingIsDeterministic() throws {
-    let dngs = sampleDNGs()
-    try #require(!dngs.isEmpty, "no exported session found — skipping")
-
-    let a = try RAWDecoder.decodeLuminance(contentsOf: dngs[0], maxDimension: 256)
-    let b = try RAWDecoder.decodeLuminance(contentsOf: dngs[0], maxDimension: 256)
+@Test(.enabled(if: SampleSession.exists()))
+func decodingIsDeterministic() throws {
+    let url = SampleSession.frames()[0]
+    let a = try RAWDecoder.decodeLuminance(contentsOf: url, maxDimension: 256)
+    let b = try RAWDecoder.decodeLuminance(contentsOf: url, maxDimension: 256)
     #expect(a.pixels == b.pixels)
 }
 
-@Test func framesFromOneSessionShareDimensions() throws {
-    let dngs = sampleDNGs()
-    try #require(dngs.count >= 2, "need at least two frames — skipping")
-
+@Test(.enabled(if: SampleSession.exists()))
+func framesFromOneSessionShareDimensions() throws {
+    let dngs = SampleSession.frames()
     let first = try RAWDecoder.decodeLuminance(contentsOf: dngs[0], maxDimension: 256)
     for url in dngs.dropFirst() {
         let next = try RAWDecoder.decodeLuminance(contentsOf: url, maxDimension: 256)
