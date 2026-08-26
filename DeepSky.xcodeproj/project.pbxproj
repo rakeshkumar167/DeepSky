@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		A1B2C3D400000000000000F3 /* DeepSkyCore in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D400000000000000F1 /* DeepSkyCore */; };
 		A1B2C3D400000000000000F4 /* DeepSkyAVCapture in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D400000000000000F2 /* DeepSkyAVCapture */; };
+		A1B2C3D400000000000000F5 /* DeepSkyCapture in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D400000000000000F6 /* DeepSkyCapture */; };
+		A1B2C3D400000000000000F7 /* DeepSkySession in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D400000000000000F8 /* DeepSkySession */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +32,8 @@
 			files = (
 				A1B2C3D400000000000000F3 /* DeepSkyCore in Frameworks */,
 				A1B2C3D400000000000000F4 /* DeepSkyAVCapture in Frameworks */,
+				A1B2C3D400000000000000F5 /* DeepSkyCapture in Frameworks */,
+				A1B2C3D400000000000000F7 /* DeepSkySession in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -74,6 +78,8 @@
 			packageProductDependencies = (
 				A1B2C3D400000000000000F1 /* DeepSkyCore */,
 				A1B2C3D400000000000000F2 /* DeepSkyAVCapture */,
+				A1B2C3D400000000000000F6 /* DeepSkyCapture */,
+				A1B2C3D400000000000000F8 /* DeepSkySession */,
 			);
 			productName = DeepSky;
 			productReference = A1B2C3D400000000000000E3 /* DeepSky.app */;
@@ -275,6 +281,14 @@
 		A1B2C3D400000000000000F2 /* DeepSkyAVCapture */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = DeepSkyAVCapture;
+		};
+		A1B2C3D400000000000000F6 /* DeepSkyCapture */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DeepSkyCapture;
+		};
+		A1B2C3D400000000000000F8 /* DeepSkySession */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DeepSkySession;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

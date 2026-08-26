@@ -1,69 +1,119 @@
 import SwiftUI
+import DeepSkyCore
+import DeepSkySession
 
-/// Mock session records. Shapes match the real `SessionManifest` /
-/// `SessionCompletion` types so wiring this to `SessionStore` later is a
-/// substitution, not a redesign.
-struct MockSession: Identifiable {
-    let id = UUID()
+/// A session as read back off disk.
+///
+/// Built from `session.json` plus the append-only `frames.jsonl`, so a session
+/// interrupted mid-capture reads correctly rather than not at all — that
+/// recovery path is core to the design, not an error case.
+struct SessionSummary: Identifiable {
+    let id: String
+    let url: URL
     let name: String
     let startedAt: Date
-    let lens: String
+    let lensName: String
     let iso: Int
     let sensorExposure: Double
     let framesWritten: Int
     let framesPlanned: Int
     let framesFlagged: Int
-    let bytes: Int
+    let bytes: Int64
     let complete: Bool
 
     var effectiveExposure: Double { sensorExposure * Double(framesWritten) }
 
-    static let samples: [MockSession] = [
-        .init(name: "Milky Way — Core", startedAt: .now.addingTimeInterval(-3600),
-              lens: "Wide", iso: 3200, sensorExposure: 1.0,
-              framesWritten: 180, framesPlanned: 180, framesFlagged: 7,
-              bytes: 4_700_000_000, complete: true),
-        .init(name: "Orion", startedAt: .now.addingTimeInterval(-86_400),
-              lens: "Telephoto", iso: 6400, sensorExposure: 1.0,
-              framesWritten: 42, framesPlanned: 120, framesFlagged: 3,
-              bytes: 1_100_000_000, complete: false),
-        .init(name: "Ridge + Stars", startedAt: .now.addingTimeInterval(-172_800),
-              lens: "Ultra Wide", iso: 1600, sensorExposure: 1.0,
-              framesWritten: 90, framesPlanned: 90, framesFlagged: 0,
-              bytes: 2_300_000_000, complete: true),
-    ]
+    static func loadAll() -> [SessionSummary] {
+        let root = URL.documentsDirectory.appendingPathComponent("Sessions")
+        let fm = FileManager.default
+        guard let entries = try? fm.contentsOfDirectory(
+            at: root, includingPropertiesForKeys: [.isDirectoryKey]) else { return [] }
+
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601   // must match SessionStore
+
+        return entries.compactMap { dir -> SessionSummary? in
+            var isDir: ObjCBool = false
+            guard fm.fileExists(atPath: dir.path, isDirectory: &isDir), isDir.boolValue,
+                  let data = try? Data(contentsOf: dir.appendingPathComponent("session.json")),
+                  let manifest = try? decoder.decode(SessionManifest.self, from: data)
+            else { return nil }
+
+            let frames = (try? SessionStore.readFrames(at: dir)) ?? []
+            let complete = fm.fileExists(atPath: dir.appendingPathComponent("completion.json").path)
+
+            return SessionSummary(
+                id: manifest.id,
+                url: dir,
+                name: manifest.name,
+                startedAt: manifest.startedAt,
+                lensName: manifest.capabilities.lenses.indices.contains(manifest.settings.lensIndex)
+                    ? manifest.capabilities.lenses[manifest.settings.lensIndex].localizedName
+                    : "Unknown lens",
+                iso: Int(manifest.settings.iso),
+                sensorExposure: manifest.settings.exposure.seconds,
+                framesWritten: frames.count,
+                framesPlanned: manifest.plan.frameCount,
+                framesFlagged: frames.filter { !$0.flags.isEmpty }.count,
+                bytes: frames.reduce(0) { $0 + Int64($1.bytes) },
+                complete: complete)
+        }
+        .sorted { $0.startedAt > $1.startedAt }
+    }
 }
 
 struct SessionsScreen: View {
     let nightMode: Bool
+    @State private var sessions: [SessionSummary] = []
 
     var body: some View {
         NavigationStack {
-            List {
-                ForEach(MockSession.samples) { session in
-                    NavigationLink { SessionDetail(session: session, nightMode: nightMode) }
-                    label: { SessionRow(session: session, nightMode: nightMode) }
-                }
-                .listRowBackground(DS.surface)
+            Group {
+                if sessions.isEmpty { emptyState } else { list }
             }
-            .scrollContentBackground(.hidden)
             .background(DS.background)
             .navigationTitle("Sessions")
         }
         .tint(DS.accent(nightMode))
+        .onAppear { sessions = SessionSummary.loadAll() }
+        .refreshable { sessions = SessionSummary.loadAll() }
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: DS.md) {
+            Image(systemName: "square.stack.3d.down.right")
+                .font(.system(size: 48)).foregroundStyle(DS.secondaryText(nightMode))
+            Text("No sessions yet")
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(DS.primaryText(nightMode))
+            Text("Captured sessions appear here, and in Files under On My iPhone → DeepSky.")
+                .font(.system(size: 13)).multilineTextAlignment(.center)
+                .foregroundStyle(DS.secondaryText(nightMode))
+                .padding(.horizontal, DS.xl)
+        }
+    }
+
+    private var list: some View {
+        List {
+            ForEach(sessions) { session in
+                NavigationLink { SessionDetail(session: session, nightMode: nightMode) }
+                label: { SessionRow(session: session, nightMode: nightMode) }
+            }
+            .listRowBackground(DS.surface)
+        }
+        .scrollContentBackground(.hidden)
     }
 }
 
 private struct SessionRow: View {
-    let session: MockSession
+    let session: SessionSummary
     let nightMode: Bool
 
     var body: some View {
         HStack(spacing: DS.md) {
             ZStack {
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(DS.surfaceRaised)
-                StarFieldThumb(seed: session.name.hashValue)
+                RoundedRectangle(cornerRadius: 10).fill(DS.surfaceRaised)
+                StarFieldThumb(seed: session.id.hashValue)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
             }
             .frame(width: 54, height: 54)
@@ -82,8 +132,7 @@ private struct SessionRow: View {
                     Text("→ \(Int(session.effectiveExposure))s")
                         .readout(12, weight: .medium)
                     if !session.complete {
-                        Label("Interrupted", systemImage: "exclamationmark.triangle.fill")
-                            .labelStyle(.iconOnly)
+                        Image(systemName: "exclamationmark.triangle.fill")
                             .font(.system(size: 11))
                             .foregroundStyle(DS.status(1, night: nightMode))
                             .accessibilityLabel("Interrupted session")
@@ -98,43 +147,52 @@ private struct SessionRow: View {
 }
 
 private struct SessionDetail: View {
-    let session: MockSession
+    let session: SessionSummary
     let nightMode: Bool
 
     var body: some View {
         List {
             Section("Capture") {
-                DetailRow("Lens", session.lens, nightMode)
+                DetailRow("Lens", session.lensName, nightMode)
                 DetailRow("ISO", "\(session.iso)", nightMode)
                 DetailRow("Sensor exposure", String(format: "%.1fs", session.sensorExposure), nightMode)
                 DetailRow("Frames", "\(session.framesWritten) / \(session.framesPlanned)", nightMode)
                 DetailRow("Effective exposure", "\(Int(session.effectiveExposure))s", nightMode, emphasised: true)
                 DetailRow("Flagged", "\(session.framesFlagged)", nightMode)
-                DetailRow("Size", ByteCountFormatStyle().format(Int64(session.bytes)), nightMode)
+                DetailRow("Size", ByteCountFormatStyle().format(session.bytes), nightMode)
+                if session.framesWritten > 0 {
+                    DetailRow("Per frame",
+                              ByteCountFormatStyle().format(session.bytes / Int64(session.framesWritten)),
+                              nightMode)
+                }
             }
             .listRowBackground(DS.surface)
 
             if !session.complete {
                 Section {
                     Label {
-                        Text("\(session.framesWritten) of \(session.framesPlanned) frames captured before the session was interrupted. Every frame written is intact and recoverable.")
+                        Text("\(session.framesWritten) of \(session.framesPlanned) frames captured before the session ended. Every frame written is intact and recoverable.")
                             .font(.system(size: 13))
                             .foregroundStyle(DS.secondaryText(nightMode))
                     } icon: {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .foregroundStyle(DS.status(1, night: nightMode))
                     }
-                    Button("Process \(session.framesWritten) frames") {}
-                    Button("Keep session") {}
-                    Button("Discard", role: .destructive) {}
                 }
                 .listRowBackground(DS.surface)
             }
 
-            Section("Frames") {
-                Text("Preview only — no capture pipeline wired.")
-                    .font(.system(size: 13))
-                    .foregroundStyle(DS.secondaryText(nightMode))
+            Section {
+                ShareLink(item: session.url) {
+                    Label("Export session folder", systemImage: "square.and.arrow.up")
+                }
+                Text(session.url.lastPathComponent)
+                    .font(.caption).foregroundStyle(DS.secondaryText(nightMode))
+                    .textSelection(.enabled)
+            } header: {
+                Text("Files")
+            } footer: {
+                Text("Also in Files under On My iPhone → DeepSky → Sessions.")
             }
             .listRowBackground(DS.surface)
         }
@@ -158,33 +216,5 @@ private struct DetailRow: View {
                 .readout(15, weight: emphasised ? .bold : .medium)
                 .foregroundStyle(emphasised ? DS.accent(night) : DS.primaryText(night))
         }
-    }
-}
-
-/// Tiny deterministic star field used as a session thumbnail.
-struct StarFieldThumb: View {
-    let seed: Int
-    var body: some View {
-        Canvas { ctx, size in
-            var rng = SystemRandomNumberGeneratorSeeded(seed: UInt64(truncatingIfNeeded: seed))
-            for _ in 0..<26 {
-                let x = Double.random(in: 0...size.width, using: &rng)
-                let y = Double.random(in: 0...size.height, using: &rng)
-                let r = Double.random(in: 0.3...1.1, using: &rng)
-                let a = Double.random(in: 0.3...1.0, using: &rng)
-                ctx.fill(Path(ellipseIn: CGRect(x: x, y: y, width: r * 2, height: r * 2)),
-                         with: .color(.white.opacity(a)))
-            }
-        }
-        .background(Color(red: 0.02, green: 0.03, blue: 0.07))
-    }
-}
-
-struct SystemRandomNumberGeneratorSeeded: RandomNumberGenerator {
-    private var state: UInt64
-    init(seed: UInt64) { state = seed &* 6364136223846793005 &+ 1442695040888963407 | 1 }
-    mutating func next() -> UInt64 {
-        state ^= state << 13; state ^= state >> 7; state ^= state << 17
-        return state
     }
 }
