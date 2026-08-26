@@ -28,7 +28,19 @@ public struct CapturePlan: Sendable, Codable, Hashable {
                              sensorExposure: ShutterSpeed,
                              intervalSeconds: Double) -> CapturePlan {
         let perFrame = sensorExposure.seconds + intervalSeconds
-        let count = perFrame > 0 ? Int((totalCaptureSeconds / perFrame).rounded(.down)) : 1
+        let count: Int
+        if perFrame > 0 && totalCaptureSeconds.isFinite {
+            let quotient = (totalCaptureSeconds / perFrame).rounded(.down)
+            if quotient >= Double(Int.max) {
+                count = Int.max
+            } else if quotient <= Double(Int.min) {
+                count = Int.min
+            } else {
+                count = Int(quotient)
+            }
+        } else {
+            count = 1
+        }
         return CapturePlan(sensorExposure: sensorExposure,
                            intervalSeconds: intervalSeconds,
                            frameCount: max(1, count))

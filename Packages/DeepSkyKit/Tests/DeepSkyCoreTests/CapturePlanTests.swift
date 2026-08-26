@@ -40,3 +40,32 @@ import DeepSkyCore
                                  intervalSeconds: 0.0)
     #expect(plan.frameCount == 1)
 }
+
+@Test func solverHandlesInfinityTotal() {
+    let plan = CapturePlan.solve(totalCaptureSeconds: .infinity,
+                                 sensorExposure: ShutterSpeed(seconds: 1.0),
+                                 intervalSeconds: 0.0)
+    #expect(plan.frameCount == 1)
+}
+
+@Test func solverHandlesNaNTotal() {
+    let plan = CapturePlan.solve(totalCaptureSeconds: .nan,
+                                 sensorExposure: ShutterSpeed(seconds: 1.0),
+                                 intervalSeconds: 0.0)
+    #expect(plan.frameCount == 1)
+}
+
+@Test func solverClampsHugeQuotientToPreventOverflow() {
+    let plan = CapturePlan.solve(totalCaptureSeconds: 1e20,
+                                 sensorExposure: ShutterSpeed(seconds: 0.1),
+                                 intervalSeconds: 0.0)
+    #expect(plan.frameCount > 0)
+    #expect(plan.frameCount <= Int.max)
+}
+
+@Test func solverHandlesZeroPerFrameGracefully() {
+    let plan = CapturePlan.solve(totalCaptureSeconds: 100,
+                                 sensorExposure: ShutterSpeed(seconds: 1.0),
+                                 intervalSeconds: -1.0)
+    #expect(plan.frameCount == 1)
+}
