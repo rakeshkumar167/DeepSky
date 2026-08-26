@@ -1,0 +1,4365 @@
+{
+  "deviceModel" : "iPhone18,1",
+  "lenses" : [
+    {
+      "deviceType" : "AVCaptureDeviceTypeBuiltInUltraWideCamera",
+      "focalLengthEquivalent" : 15,
+      "formats" : [
+        {
+          "height" : 144,
+          "horizontalFieldOfViewDegrees" : 101.02159,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              192,
+              144
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 192
+        },
+        {
+          "height" : 144,
+          "horizontalFieldOfViewDegrees" : 101.02159,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              192,
+              144
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 192
+        },
+        {
+          "height" : 288,
+          "horizontalFieldOfViewDegrees" : 96.09329,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              352,
+              288
+            ],
+            [
+              3696,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 352
+        },
+        {
+          "height" : 288,
+          "horizontalFieldOfViewDegrees" : 96.09329,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              352,
+              288
+            ],
+            [
+              3696,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 352
+        },
+        {
+          "height" : 360,
+          "horizontalFieldOfViewDegrees" : 101.02159,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              480,
+              360
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 480
+        },
+        {
+          "height" : 360,
+          "horizontalFieldOfViewDegrees" : 101.02159,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              480,
+              360
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 480
+        },
+        {
+          "height" : 480,
+          "horizontalFieldOfViewDegrees" : 101.02159,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              640,
+              480
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 640
+        },
+        {
+          "height" : 480,
+          "horizontalFieldOfViewDegrees" : 101.02159,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              640,
+              480
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 640
+        },
+        {
+          "height" : 480,
+          "horizontalFieldOfViewDegrees" : 101.02159,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              640,
+              480
+            ],
+            [
+              2016,
+              1512
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 640
+        },
+        {
+          "height" : 480,
+          "horizontalFieldOfViewDegrees" : 101.02159,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              640,
+              480
+            ],
+            [
+              2016,
+              1512
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 640
+        },
+        {
+          "height" : 540,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              960,
+              540
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 960
+        },
+        {
+          "height" : 540,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              960,
+              540
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 960
+        },
+        {
+          "height" : 768,
+          "horizontalFieldOfViewDegrees" : 101.02159,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1024,
+              768
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1024
+        },
+        {
+          "height" : 768,
+          "horizontalFieldOfViewDegrees" : 101.02159,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1024,
+              768
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1024
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ],
+            [
+              2112,
+              1188
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ],
+            [
+              2112,
+              1188
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 750,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 750,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 101.02159,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1440,
+              1080
+            ],
+            [
+              2016,
+              1512
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1440
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 101.02159,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1440,
+              1080
+            ],
+            [
+              2016,
+              1512
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1440
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              2112,
+              1188
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              2112,
+              1188
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 1200,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 1200,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 750,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 750,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1440,
+          "horizontalFieldOfViewDegrees" : 103.62532,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1440
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1440,
+          "horizontalFieldOfViewDegrees" : 103.62532,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1440
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1440,
+          "horizontalFieldOfViewDegrees" : 103.62532,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1440
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1440,
+          "horizontalFieldOfViewDegrees" : 103.62532,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1440
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1440,
+          "horizontalFieldOfViewDegrees" : 103.62532,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1440
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1440,
+          "horizontalFieldOfViewDegrees" : 103.62532,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1440
+            ],
+            [
+              2016,
+              1512
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1440,
+          "horizontalFieldOfViewDegrees" : 103.62532,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1440
+            ],
+            [
+              2016,
+              1512
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1944,
+          "horizontalFieldOfViewDegrees" : 103.62532,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              2592,
+              1944
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 2592
+        },
+        {
+          "height" : 1944,
+          "horizontalFieldOfViewDegrees" : 103.62532,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              2592,
+              1944
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 2592
+        },
+        {
+          "height" : 2448,
+          "horizontalFieldOfViewDegrees" : 103.62532,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              3264,
+              2448
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 3264
+        },
+        {
+          "height" : 2448,
+          "horizontalFieldOfViewDegrees" : 103.62532,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              3264,
+              2448
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 3264
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2240,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              4224,
+              2240
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 4224
+        },
+        {
+          "height" : 3024,
+          "horizontalFieldOfViewDegrees" : 103.62532,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              4032,
+              3024
+            ],
+            [
+              8064,
+              6048
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 4032
+        },
+        {
+          "height" : 3024,
+          "horizontalFieldOfViewDegrees" : 103.62532,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              4032,
+              3024
+            ],
+            [
+              8064,
+              6048
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 4032
+        },
+        {
+          "height" : 3024,
+          "horizontalFieldOfViewDegrees" : 106.2007,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3600,
+          "maxPhotoDimensions" : [
+            [
+              4224,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 4224
+        }
+      ],
+      "localizedName" : "Back Ultra Wide Camera"
+    },
+    {
+      "deviceType" : "AVCaptureDeviceTypeBuiltInWideAngleCamera",
+      "focalLengthEquivalent" : 26,
+      "formats" : [
+        {
+          "height" : 144,
+          "horizontalFieldOfViewDegrees" : 69.52744,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              192,
+              144
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 192
+        },
+        {
+          "height" : 144,
+          "horizontalFieldOfViewDegrees" : 69.52744,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              192,
+              144
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 192
+        },
+        {
+          "height" : 288,
+          "horizontalFieldOfViewDegrees" : 64.93225,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              352,
+              288
+            ],
+            [
+              3696,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 352
+        },
+        {
+          "height" : 288,
+          "horizontalFieldOfViewDegrees" : 64.93225,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              352,
+              288
+            ],
+            [
+              3696,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 352
+        },
+        {
+          "height" : 360,
+          "horizontalFieldOfViewDegrees" : 69.52744,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              480,
+              360
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 480
+        },
+        {
+          "height" : 360,
+          "horizontalFieldOfViewDegrees" : 69.52744,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              480,
+              360
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 480
+        },
+        {
+          "height" : 480,
+          "horizontalFieldOfViewDegrees" : 69.52744,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              640,
+              480
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 640
+        },
+        {
+          "height" : 480,
+          "horizontalFieldOfViewDegrees" : 69.52744,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              640,
+              480
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 640
+        },
+        {
+          "height" : 480,
+          "horizontalFieldOfViewDegrees" : 69.52744,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              640,
+              480
+            ],
+            [
+              2016,
+              1512
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 640
+        },
+        {
+          "height" : 480,
+          "horizontalFieldOfViewDegrees" : 69.52744,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              640,
+              480
+            ],
+            [
+              2016,
+              1512
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 640
+        },
+        {
+          "height" : 540,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              960,
+              540
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 960
+        },
+        {
+          "height" : 540,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              960,
+              540
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 960
+        },
+        {
+          "height" : 768,
+          "horizontalFieldOfViewDegrees" : 69.52744,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1024,
+              768
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1024
+        },
+        {
+          "height" : 768,
+          "horizontalFieldOfViewDegrees" : 69.52744,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1024,
+              768
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1024
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ],
+            [
+              2112,
+              1188
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ],
+            [
+              2112,
+              1188
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 2160,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 2160,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 69.52744,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1440,
+              1080
+            ],
+            [
+              2016,
+              1512
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1440
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 69.52744,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1440,
+              1080
+            ],
+            [
+              2016,
+              1512
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1440
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              2112,
+              1188
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              2112,
+              1188
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3456,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3456,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3456,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3456,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 2160,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 2160,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1440,
+          "horizontalFieldOfViewDegrees" : 72.04411,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1440
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1440,
+          "horizontalFieldOfViewDegrees" : 72.04411,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1440
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1440,
+          "horizontalFieldOfViewDegrees" : 72.04411,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1440
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1440,
+          "horizontalFieldOfViewDegrees" : 72.04411,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1440
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1440,
+          "horizontalFieldOfViewDegrees" : 72.04411,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1440
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1440,
+          "horizontalFieldOfViewDegrees" : 72.04411,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1440
+            ],
+            [
+              2016,
+              1512
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1440,
+          "horizontalFieldOfViewDegrees" : 72.04411,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1440
+            ],
+            [
+              2016,
+              1512
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1944,
+          "horizontalFieldOfViewDegrees" : 72.04411,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              2592,
+              1944
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 2592
+        },
+        {
+          "height" : 1944,
+          "horizontalFieldOfViewDegrees" : 72.04411,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              2592,
+              1944
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 2592
+        },
+        {
+          "height" : 2448,
+          "horizontalFieldOfViewDegrees" : 72.04411,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              3264,
+              2448
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 3264
+        },
+        {
+          "height" : 2448,
+          "horizontalFieldOfViewDegrees" : 72.04411,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              3264,
+              2448
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 3264
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3456,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3456,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3456,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 3456,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2240,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              4224,
+              2240
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 4224
+        },
+        {
+          "height" : 2240,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              4224,
+              2240
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 4224
+        },
+        {
+          "height" : 3024,
+          "horizontalFieldOfViewDegrees" : 72.04411,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 12096,
+          "maxPhotoDimensions" : [
+            [
+              4032,
+              3024
+            ],
+            [
+              8064,
+              6048
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 4032
+        },
+        {
+          "height" : 3024,
+          "horizontalFieldOfViewDegrees" : 72.04411,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 12096,
+          "maxPhotoDimensions" : [
+            [
+              4032,
+              3024
+            ],
+            [
+              8064,
+              6048
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 4032
+        },
+        {
+          "height" : 3024,
+          "horizontalFieldOfViewDegrees" : 74.59712,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 5184,
+          "maxPhotoDimensions" : [
+            [
+              4224,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 54,
+          "rawPixelFormats" : [
+            "l64r",
+            "bgg4"
+          ],
+          "width" : 4224
+        }
+      ],
+      "localizedName" : "Back Camera"
+    },
+    {
+      "deviceType" : "AVCaptureDeviceTypeBuiltInTelephotoCamera",
+      "focalLengthEquivalent" : 113,
+      "formats" : [
+        {
+          "height" : 144,
+          "horizontalFieldOfViewDegrees" : 18.125044,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              192,
+              144
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 192
+        },
+        {
+          "height" : 144,
+          "horizontalFieldOfViewDegrees" : 18.125044,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              192,
+              144
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 192
+        },
+        {
+          "height" : 288,
+          "horizontalFieldOfViewDegrees" : 16.636696,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              352,
+              288
+            ],
+            [
+              3696,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 352
+        },
+        {
+          "height" : 288,
+          "horizontalFieldOfViewDegrees" : 16.636696,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              352,
+              288
+            ],
+            [
+              3696,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 352
+        },
+        {
+          "height" : 360,
+          "horizontalFieldOfViewDegrees" : 18.125044,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              480,
+              360
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 480
+        },
+        {
+          "height" : 360,
+          "horizontalFieldOfViewDegrees" : 18.125044,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              480,
+              360
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 480
+        },
+        {
+          "height" : 480,
+          "horizontalFieldOfViewDegrees" : 18.125044,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              640,
+              480
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 640
+        },
+        {
+          "height" : 480,
+          "horizontalFieldOfViewDegrees" : 18.125044,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              640,
+              480
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 640
+        },
+        {
+          "height" : 480,
+          "horizontalFieldOfViewDegrees" : 18.125044,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              640,
+              480
+            ],
+            [
+              2016,
+              1512
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 640
+        },
+        {
+          "height" : 480,
+          "horizontalFieldOfViewDegrees" : 18.125044,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              640,
+              480
+            ],
+            [
+              2016,
+              1512
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 640
+        },
+        {
+          "height" : 540,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              960,
+              540
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 960
+        },
+        {
+          "height" : 540,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              960,
+              540
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 960
+        },
+        {
+          "height" : 768,
+          "horizontalFieldOfViewDegrees" : 18.125044,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1024,
+              768
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1024
+        },
+        {
+          "height" : 768,
+          "horizontalFieldOfViewDegrees" : 18.125044,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1024,
+              768
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1024
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ],
+            [
+              2112,
+              1188
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ],
+            [
+              2112,
+              1188
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 960,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 720,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 960,
+          "maxPhotoDimensions" : [
+            [
+              1280,
+              720
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1280
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 18.125044,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1440,
+              1080
+            ],
+            [
+              2016,
+              1512
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1440
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 18.125044,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1440,
+              1080
+            ],
+            [
+              2016,
+              1512
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1440
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              2112,
+              1188
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ],
+            [
+              2112,
+              1188
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 960,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 960,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 960,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1080,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 960,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1080
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1440,
+          "horizontalFieldOfViewDegrees" : 18.9728,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1440
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1440,
+          "horizontalFieldOfViewDegrees" : 18.9728,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1440
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1440,
+          "horizontalFieldOfViewDegrees" : 18.9728,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1440
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1440,
+          "horizontalFieldOfViewDegrees" : 18.9728,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1440
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1440,
+          "horizontalFieldOfViewDegrees" : 18.9728,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1440
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1440,
+          "horizontalFieldOfViewDegrees" : 18.9728,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1440
+            ],
+            [
+              2016,
+              1512
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1440,
+          "horizontalFieldOfViewDegrees" : 18.9728,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              1920,
+              1440
+            ],
+            [
+              2016,
+              1512
+            ]
+          ],
+          "minExposureSeconds" : 2.3e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 1920
+        },
+        {
+          "height" : 1944,
+          "horizontalFieldOfViewDegrees" : 18.9728,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              2592,
+              1944
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 2592
+        },
+        {
+          "height" : 1944,
+          "horizontalFieldOfViewDegrees" : 18.9728,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              2592,
+              1944
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 2592
+        },
+        {
+          "height" : 2448,
+          "horizontalFieldOfViewDegrees" : 18.9728,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              3264,
+              2448
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 3264
+        },
+        {
+          "height" : 2448,
+          "horizontalFieldOfViewDegrees" : 18.9728,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              3264,
+              2448
+            ],
+            [
+              4032,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 3264
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ],
+            [
+              4224,
+              2376
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2160,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              3840,
+              2160
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 3840
+        },
+        {
+          "height" : 2240,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              4224,
+              2240
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 4224
+        },
+        {
+          "height" : 3024,
+          "horizontalFieldOfViewDegrees" : 18.9728,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              4032,
+              3024
+            ],
+            [
+              8064,
+              6048
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 4032
+        },
+        {
+          "height" : 3024,
+          "horizontalFieldOfViewDegrees" : 18.9728,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              4032,
+              3024
+            ],
+            [
+              8064,
+              6048
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 4032
+        },
+        {
+          "height" : 3024,
+          "horizontalFieldOfViewDegrees" : 19.858683,
+          "maxExposureSeconds" : 1,
+          "maxISO" : 7680,
+          "maxPhotoDimensions" : [
+            [
+              4224,
+              3024
+            ]
+          ],
+          "minExposureSeconds" : 1.4e-05,
+          "minISO" : 15,
+          "rawPixelFormats" : [
+            "rgg4",
+            "l64r"
+          ],
+          "width" : 4224
+        }
+      ],
+      "localizedName" : "Back Telephoto Camera"
+    }
+  ],
+  "osVersion" : "Version 26.6.1 (Build 23G83)",
+  "probedAt" : "2026-08-26T17:57:07Z",
+  "supportsAppleProRAW" : true
+}

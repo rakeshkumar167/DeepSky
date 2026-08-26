@@ -146,3 +146,52 @@ which contradicts spec §4 ("Capture, Metrics, Session depend only on Core") and
 Global Constraints — the plan then overrides itself at Task 12. The graph stays acyclic, so this is
 a deviation rather than a defect, but note that Task 1's "verify the dependency rule holds" check
 only tests for *external* dependencies and would not catch future drift either.
+
+## 7. Real device profiles — what the hardware actually reports
+
+Two profiles are committed under
+`Packages/DeepSkyKit/Tests/DeepSkyCoreTests/Fixtures/` and asserted against in
+`RealDeviceProfileTests`. Captured 2026-08-26 with the in-app probe.
+
+| | iPhone 15 Pro (iPhone16,1) | iPhone 17 Pro (iPhone18,1) |
+|---|---|---|
+| iOS | 26.6 | 26.6.1 |
+| Formats | 183 | 196 |
+| **Max sensor exposure** | **1.000000 s** | **1.000000 s** |
+| Ultra-wide ISO | 32–3072 | 15–3600 |
+| Wide ISO | 55–12320 | 54–12096 |
+| Telephoto ISO | 18–2304 | **15–7680** |
+| Telephoto FOV | 22.2–26.4° | **16.6–19.9°** |
+| 48MP | wide only | **all three lenses** |
+| ProRAW (`l64r`) | all lenses | all lenses |
+| Bayer | `bgg4` wide, `rgg4` others | `bgg4` wide, `rgg4` others |
+
+**The exposure ceiling is 1.000000 s on both devices, across all 379 format
+entries between them, with zero variation.** Two generations of sensor and
+silicon reporting an identical value is strong evidence of a platform-wide
+AVFoundation limit rather than a device characteristic. The requirements
+document's 30-second shutter is not achievable as a single sensor read, so the
+runtime-derived ladder and the stacking-first architecture are confirmed by
+hardware rather than argued from inference.
+
+### Consequences for Plan 2
+
+- **48MP cannot be a global mode.** Wide-only on the 15 Pro, every lens on the
+  17 Pro. A UI built against either device alone would be wrong on the other.
+- **Field of view varies per format within a lens** (wide: 64.9–74.6° on both).
+  `StabilityEstimator` reading FOV per-format rather than per-lens is required,
+  not fastidious — a per-lens constant mis-bands drift by up to ~15%.
+- **The 17 Pro telephoto is a viable astro lens; the 15 Pro's is not.** 7680 vs
+  2304 max ISO is a 3.3× difference in headroom at a narrower field of view.
+- **Bayer pattern differs by sensor within a single device**, so the demosaic
+  path cannot assume one pattern.
+
+### Known inaccuracy in the probe
+
+`focalLengthEquivalent` is derived from `videoFieldOfView`, which describes the
+*video* crop — narrower than the full still frame. It therefore reads ~8% long
+against Apple's marketing figures (15/26/84mm vs 13/24/77mm on the 15 Pro;
+15/26/113mm on the 17 Pro). The numbers are honestly derived from what the
+hardware reports, but they are not the published focal lengths. If the UI shows
+focal length to users, either correct for the still-frame crop or drop the
+derivation and map `deviceType` to nominal values.
