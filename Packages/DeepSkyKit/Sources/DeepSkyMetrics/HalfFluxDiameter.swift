@@ -5,8 +5,13 @@ public struct LuminancePatch: Sendable {
     public let height: Int
     public let pixels: [Float]
 
-    public init(width: Int, height: Int, pixels: [Float]) {
-        precondition(pixels.count == width * height, "pixel count must equal width * height")
+    /// Returns nil rather than trapping on a malformed patch.
+    ///
+    /// Live capture buffers are sliced by stride and crop arithmetic this type
+    /// does not control. A bad slice must cost one frame, not the session — so
+    /// this cannot be a precondition once real buffers reach it.
+    public init?(width: Int, height: Int, pixels: [Float]) {
+        guard width > 0, height > 0, pixels.count == width * height else { return nil }
         self.width = width
         self.height = height
         self.pixels = pixels
