@@ -3,10 +3,11 @@ import DeepSkyCore
 import DeepSkyAVCapture
 
 /// The first thing DeepSky ever put on a phone: read what this device's
-/// cameras can actually do, show it, and let it off the device as JSON.
+/// cameras can actually do, derive the honest shutter ladder from it, and
+/// let the raw numbers off the device as JSON.
 ///
-/// The output is a fixture. Committing one per device is what lets the
-/// shutter ladder and stability banding be tested against real hardware
+/// The JSON is a fixture. Committing one per device is what lets
+/// `ShutterLadder` and `StabilityEstimator` be tested against real hardware
 /// limits instead of assumptions.
 struct ProbeView: View {
     @State private var state: ProbeState = .idle
@@ -15,7 +16,7 @@ struct ProbeView: View {
         case idle
         case running
         case failed(String)
-        case done(summary: [LensSummary], fileURL: URL, json: String)
+        case done(lenses: [LensSummary], fileURL: URL, json: String)
     }
 
     struct LensSummary: Identifiable {
@@ -23,9 +24,9 @@ struct ProbeView: View {
         let name: String
         let focalLength: Int?
         let formatCount: Int
-        let maxExposureSeconds: Double
-        let minExposureSeconds: Double
-        let maxISO: Float
+        /// The format an astro capture would actually select, and the ladder derived from it.
+        let astroFormat: FormatCapability
+        let ladder: [ShutterSpeed]
         let rawFormats: [String]
     }
 
@@ -36,7 +37,7 @@ struct ProbeView: View {
                 case .idle:      idleView
                 case .running:   ProgressView("Probing cameras…")
                 case .failed(let message): failureView(message)
-                case .done(let summary, let url, let json): resultView(summary, url, json)
+                case .done(let lenses, let url, let json): resultView(lenses, url, json)
                 }
             }
             .padding()
@@ -49,7 +50,7 @@ struct ProbeView: View {
             Image(systemName: "camera.aperture")
                 .font(.system(size: 56))
                 .foregroundStyle(.secondary)
-            Text("Reads the real exposure, ISO and RAW limits of this iPhone's cameras.")
+            Text("Reads the real exposure, ISO and RAW limits of this iPhone's cameras, then derives the shutter ladder from them.")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
             Button("Run Probe") { Task { await runProbe() } }
@@ -67,30 +68,52 @@ struct ProbeView: View {
         }
     }
 
-    private func resultView(_ summary: [LensSummary], _ url: URL, _ json: String) -> some View {
+    private func resultView(_ lenses: [LensSummary], _ url: URL, _ json: String) -> some View {
         List {
-            Section {
-                ForEach(summary) { lens in
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack {
-                            Text(lens.name).font(.headline)
-                            Spacer()
-                            if let f = lens.focalLength {
-                                Text("\(f)mm").foregroundStyle(.secondary)
-                            }
-                        }
-                        // The number this whole app is designed around.
-                        Text("Max sensor exposure: \(lens.maxExposureSeconds, format: .number.precision(.fractionLength(3)))s")
-                            .font(.callout).bold()
-                        Text("Min exposure: 1/\(Int((1 / max(lens.minExposureSeconds, 1e-9)).rounded()))   •   Max ISO: \(Int(lens.maxISO))")
-                            .font(.caption).foregroundStyle(.secondary)
-                        Text("\(lens.formatCount) formats   •   RAW: \(lens.rawFormats.isEmpty ? "none" : lens.rawFormats.joined(separator: ", "))")
-                            .font(.caption).foregroundStyle(.secondary)
+            ForEach(lenses) { lens in
+                Section {
+                    // The number this whole app is designed around.
+                    LabeledContent("Max sensor exposure") {
+                        Text(ShutterSpeed(seconds: lens.astroFormat.maxExposureSeconds).displayLabel)
+                            .bold().monospacedDigit()
                     }
-                    .padding(.vertical, 2)
+                    LabeledContent("Shortest exposure") {
+                        Text(ShutterSpeed(seconds: lens.astroFormat.minExposureSeconds).displayLabel)
+                            .monospacedDigit()
+                    }
+                    LabeledContent("ISO range") {
+                        Text("\(Int(lens.astroFormat.minISO))–\(Int(lens.astroFormat.maxISO))")
+                            .monospacedDigit()
+                    }
+                    LabeledContent("Field of view") {
+                        Text("\(lens.astroFormat.horizontalFieldOfViewDegrees, format: .number.precision(.fractionLength(1)))°")
+                            .monospacedDigit()
+                    }
+                    LabeledContent("Sensor") {
+                        Text("\(lens.astroFormat.width)×\(lens.astroFormat.height)")
+                            .monospacedDigit()
+                    }
+                    LabeledContent("RAW") {
+                        Text(lens.rawFormats.isEmpty ? "none" : lens.rawFormats.joined(separator: " "))
+                            .monospacedDigit()
+                    }
+
+                    DisclosureGroup("Derived shutter ladder (\(lens.ladder.count))") {
+                        Text(lens.ladder.map(\.displayLabel).joined(separator: "   "))
+                            .font(.system(.caption, design: .monospaced))
+                            .textSelection(.enabled)
+                    }
+
+                    effectiveExposureNote(for: lens)
+                } header: {
+                    HStack {
+                        Text(lens.name)
+                        Spacer()
+                        if let f = lens.focalLength { Text("≈\(f)mm").foregroundStyle(.secondary) }
+                    }
+                } footer: {
+                    Text("Ladder derived from this lens's astro format (\(lens.formatCount) formats available). Entries the hardware cannot deliver never appear.")
                 }
-            } header: {
-                Text("Back cameras")
             }
 
             Section {
@@ -103,7 +126,7 @@ struct ProbeView: View {
             } header: {
                 Text("Fixture")
             } footer: {
-                Text("Also visible in Files under On My iPhone → DeepSky. Commit one per device.")
+                Text("Also in Files under On My iPhone → DeepSky. Commit one per device.")
             }
 
             Section("Raw JSON") {
@@ -111,6 +134,38 @@ struct ProbeView: View {
                     .font(.system(.caption2, design: .monospaced))
                     .textSelection(.enabled)
             }
+        }
+    }
+
+    /// Spells out the §27 distinction the product depends on: the sensor's real
+    /// exposure ceiling versus what stacking is equivalent to. If the ceiling is
+    /// ~1s, a "60 second exposure" is 60 stacked frames, and saying otherwise
+    /// would be a lie about physics.
+    private func effectiveExposureNote(for lens: LensSummary) -> some View {
+        let longest = lens.ladder.last ?? ShutterSpeed(seconds: lens.astroFormat.maxExposureSeconds)
+        let plan = CapturePlan.solve(
+            totalCaptureSeconds: 60, sensorExposure: longest, intervalSeconds: 0)
+        return VStack(alignment: .leading, spacing: 4) {
+            Text("A 60-second exposure on this lens")
+                .font(.caption).foregroundStyle(.secondary)
+            Text("\(plan.frameCount) × \(longest.displayLabel) stacked")
+                .font(.callout).bold()
+            Text("Effective \(plan.effectiveExposureSeconds, format: .number.precision(.fractionLength(0)))s · sensor never exposes longer than \(longest.displayLabel)")
+                .font(.caption2).foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 2)
+    }
+
+    /// Picks the format an astro capture would actually use: the longest
+    /// possible sensor exposure first, then the largest sensor area to break
+    /// ties. Exposure ceiling dominates because it sets how few frames a given
+    /// effective exposure needs, and every extra frame is more alignment error.
+    private func astroFormat(from formats: [FormatCapability]) -> FormatCapability? {
+        formats.max { a, b in
+            if a.maxExposureSeconds != b.maxExposureSeconds {
+                return a.maxExposureSeconds < b.maxExposureSeconds
+            }
+            return (a.width * a.height) < (b.width * b.height)
         }
     }
 
@@ -135,19 +190,19 @@ struct ProbeView: View {
                 .appendingPathComponent("capabilities-\(capabilities.deviceModel).json")
             try data.write(to: url, options: .atomic)
 
-            let summary = capabilities.lenses.map { lens in
-                LensSummary(
+            let lenses: [LensSummary] = capabilities.lenses.compactMap { lens in
+                guard let format = astroFormat(from: lens.formats) else { return nil }
+                return LensSummary(
                     name: lens.localizedName,
                     focalLength: lens.focalLengthEquivalent,
                     formatCount: lens.formats.count,
-                    maxExposureSeconds: lens.formats.map(\.maxExposureSeconds).max() ?? 0,
-                    minExposureSeconds: lens.formats.map(\.minExposureSeconds).min() ?? 0,
-                    maxISO: lens.formats.map(\.maxISO).max() ?? 0,
+                    astroFormat: format,
+                    ladder: ShutterLadder.ladder(for: format),
                     rawFormats: Array(Set(lens.formats.flatMap(\.rawPixelFormats))).sorted())
             }
 
             state = .done(
-                summary: summary,
+                lenses: lenses,
                 fileURL: url,
                 json: String(decoding: data, as: UTF8.self))
         } catch {
