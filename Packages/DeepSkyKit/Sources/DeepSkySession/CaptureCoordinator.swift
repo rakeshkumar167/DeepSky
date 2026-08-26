@@ -35,7 +35,7 @@ public actor CaptureCoordinator {
         // actually fires; `apply` performs the same bounds check and would
         // otherwise make this guard unreachable dead code.
         guard settings.lensIndex >= 0, settings.lensIndex < manifest.capabilities.lenses.count,
-              let format = manifest.capabilities.lenses[settings.lensIndex].formats.first else {
+              let format = manifest.capabilities.lenses[settings.lensIndex].captureFormat else {
             throw CaptureError.invalidLensIndex(settings.lensIndex)
         }
 
@@ -56,7 +56,11 @@ public actor CaptureCoordinator {
 
         // Until a frame is actually captured we have no measured size, so
         // the policy is seeded with a conservative 12 MP ProRAW estimate.
-        var bytesPerFrame = 25 * 1_048_576
+        // Seed for the pre-flight storage check only; replaced by the first
+        // frame's real size. 20MB is measured — 12MP ProRAW from an iPhone 15
+        // Pro came in at 17.7-19.1MB across a real session — rounded up so the
+        // estimate errs toward refusing a session rather than filling the disk.
+        var bytesPerFrame = 20 * 1_048_576
         var written = 0
         var flagged = 0
 

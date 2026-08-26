@@ -156,7 +156,7 @@ public actor AVCaptureDriver: CameraDevice {
         guard settings.lensIndex >= 0, settings.lensIndex < capabilities.lenses.count else {
             throw CaptureError.invalidLensIndex(settings.lensIndex)
         }
-        guard let format = capabilities.lenses[settings.lensIndex].formats.first else {
+        guard let format = capabilities.lenses[settings.lensIndex].captureFormat else {
             throw CaptureError.invalidLensIndex(settings.lensIndex)
         }
         guard settings.exposure.seconds <= format.maxExposureSeconds else {

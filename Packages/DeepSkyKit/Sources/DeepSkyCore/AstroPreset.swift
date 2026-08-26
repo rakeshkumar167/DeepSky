@@ -54,11 +54,7 @@ public enum AstroPreset {
     /// because it sets how few frames a given integration needs, and every
     /// extra frame is more accumulated drift.
     public static func astroFormat(for lens: LensCapability) -> FormatCapability? {
-        lens.formats.max { a, b in
-            a.maxExposureSeconds != b.maxExposureSeconds
-                ? a.maxExposureSeconds < b.maxExposureSeconds
-                : (a.width * a.height) < (b.width * b.height)
-        }
+        lens.captureFormat
     }
 
     /// Frames are one second each, so the 500-rule seconds figure is also the
