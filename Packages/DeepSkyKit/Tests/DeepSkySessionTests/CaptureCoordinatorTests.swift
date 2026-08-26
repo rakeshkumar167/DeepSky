@@ -1,5 +1,6 @@
 import Testing
 import Foundation
+import Synchronization
 import DeepSkyCore
 import DeepSkyCapture
 import DeepSkySynthetic
@@ -12,6 +13,29 @@ private struct StubSensor: EnvironmentSensor {
     func thermalState() -> ThermalState { thermal }
     func freeBytes() -> Int64 { free }
     func rmsAngularRate() -> Double { rate }
+}
+
+/// Reports `.critical` on exactly its first `thermalState()` call, and
+/// `.nominal` on every call after that. `EnvironmentSensor` is `Sendable`
+/// and its methods are synchronous, so the call counter needs real
+/// synchronisation — `Mutex` rather than a plain `var`.
+///
+/// This exists to make the `captureLoop:` label test-discriminating (see
+/// `stopsPermanentlyOnFirstCriticalDecisionRatherThanRetrying` below): a
+/// fixed always-`.critical` sensor cannot tell a correct labelled `break`
+/// from a buggy bare `break`, because `CapturePolicy.decide` would just
+/// return `.stop` again on every subsequent iteration either way.
+private final class OneShotCriticalSensor: EnvironmentSensor, Sendable {
+    private let callCount = Mutex(0)
+
+    func thermalState() -> ThermalState {
+        callCount.withLock { count in
+            count += 1
+            return count == 1 ? .critical : .nominal
+        }
+    }
+    func freeBytes() -> Int64 { 100_000_000_000 }
+    func rmsAngularRate() -> Double { 0.0001 }
 }
 
 private func caps() -> DeviceCapabilities {
@@ -37,6 +61,13 @@ private func manifest(frames: Int) -> SessionManifest {
 
 private func stdSettings() -> CaptureSettings {
     CaptureSettings(lensIndex: 0, iso: 1600, exposure: ShutterSpeed(seconds: 1.0),
+                    lensPosition: 1.0, whiteBalanceKelvin: 3900, exposureBias: 0)
+}
+
+/// Exposure beyond the format's 1.0s maximum — `camera.apply` rejects
+/// this before any frame is captured.
+private func rejectedSettings() -> CaptureSettings {
+    CaptureSettings(lensIndex: 0, iso: 1600, exposure: ShutterSpeed(seconds: 5.0),
                     lensPosition: 1.0, whiteBalanceKelvin: 3900, exposureBias: 0)
 }
 
@@ -155,4 +186,63 @@ private func tempRoot() -> URL {
     let records = try SessionStore.readFrames(at: dir)
     #expect(records.allSatisfy { $0.isDark })
     #expect(records.allSatisfy { $0.file.hasPrefix("darks/") })
+}
+
+@Test func stopsPermanentlyOnFirstCriticalDecisionRatherThanRetrying() async throws {
+    // Discriminates the labelled `break captureLoop` from a bare `break`.
+    // `OneShotCriticalSensor` reports `.critical` only on its very first
+    // call, then `.nominal` forever after. With the correct labelled
+    // break the loop exits for good on that first `.stop` decision, so
+    // no frame is ever captured (framesWritten == 0). A bare `break`
+    // would only exit the `switch`: the loop would move to iteration 2,
+    // re-decide against the now-`.nominal` reading, reach `.proceed`,
+    // and capture — and every iteration after that, since the sensor
+    // never reports `.critical` again — so framesWritten would be > 0.
+    let root = tempRoot()
+    let coordinator = CaptureCoordinator(
+        camera: SyntheticDriver(capabilities: caps(), seed: 42),
+        store: SessionStore(root: root),
+        sensor: OneShotCriticalSensor())
+
+    let completion = try await coordinator.run(manifest: manifest(frames: 20),
+                                               settings: stdSettings(), isDark: false)
+    #expect(completion.framesWritten == 0)
+}
+
+@Test func zeroFrameCountFinalisesAnEmptySessionWithoutCrashing() async throws {
+    let root = tempRoot()
+    let coordinator = CaptureCoordinator(
+        camera: SyntheticDriver(capabilities: caps(), seed: 42),
+        store: SessionStore(root: root),
+        sensor: StubSensor())
+
+    let completion = try await coordinator.run(manifest: manifest(frames: 0),
+                                               settings: stdSettings(), isDark: false)
+    #expect(completion.framesWritten == 0)
+
+    let dir = try FileManager.default
+        .contentsOfDirectory(at: root, includingPropertiesForKeys: nil)[0]
+    #expect(FileManager.default.fileExists(
+        atPath: dir.appendingPathComponent("completion.json").path))
+}
+
+@Test func finalisesSessionWhenApplyRejectsSettingsBeforeAnyFrame() async throws {
+    let root = tempRoot()
+    let coordinator = CaptureCoordinator(
+        camera: SyntheticDriver(capabilities: caps(), seed: 42),
+        store: SessionStore(root: root),
+        sensor: StubSensor())
+
+    await #expect(throws: CaptureError.self) {
+        _ = try await coordinator.run(manifest: manifest(frames: 5),
+                                      settings: rejectedSettings(), isDark: false)
+    }
+
+    let dir = try FileManager.default
+        .contentsOfDirectory(at: root, includingPropertiesForKeys: nil)[0]
+    let completionURL = dir.appendingPathComponent("completion.json")
+    #expect(FileManager.default.fileExists(atPath: completionURL.path))
+    let completion = try JSONDecoder().decode(SessionCompletion.self,
+                                              from: Data(contentsOf: completionURL))
+    #expect(completion.framesWritten == 0)
 }
