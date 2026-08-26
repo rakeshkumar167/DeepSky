@@ -827,6 +827,7 @@ git commit -m "feat: add session record types with closed flag set"
 
 **Files:**
 - Create: `Packages/DeepSkyKit/Sources/DeepSkySession/SessionStore.swift`
+- Delete: `Packages/DeepSkyKit/Sources/DeepSkySession/DeepSkySession.swift` (the Task 1 placeholder — the target now has a real file, so the placeholder `DeepSkySessionModule` enum is dead code)
 - Test: `Packages/DeepSkyKit/Tests/DeepSkySessionTests/SessionStoreTests.swift`
 
 **Interfaces:**
@@ -845,7 +846,7 @@ import DeepSkyCore
 
 private func makeManifest() -> SessionManifest {
     SessionManifest(
-        id: "test-session", name: "Milky Way",
+        id: UUID().uuidString, name: "Milky Way",
         startedAt: Date(timeIntervalSince1970: 776000000),
         plan: CapturePlan(sensorExposure: ShutterSpeed(seconds: 1.0),
                           intervalSeconds: 0.05, frameCount: 60),
@@ -955,13 +956,14 @@ import DeepSkyCore
 public actor SessionStore {
     private let root: URL
     private let encoder: JSONEncoder
-    private let decoder: JSONDecoder
 
     public init(root: URL) {
         self.root = root
         self.encoder = JSONEncoder()
-        self.decoder = JSONDecoder()
     }
+
+    // No stored decoder: `readFrames` is `nonisolated static` and so cannot reach
+    // actor-isolated state — it constructs its own. A stored one would be dead.
 
     public func create(manifest: SessionManifest) throws -> URL {
         let stamp = ISO8601DateFormatter.filenameSafe.string(from: manifest.startedAt)
@@ -1032,14 +1034,15 @@ public actor SessionStore {
     }
 }
 
-extension ISO8601DateFormatter {
-    static let filenameSafe: ISO8601DateFormatter = {
-        let f = ISO8601DateFormatter()
-        f.formatOptions = [.withFullDate, .withTime, .withTimeZone]
-        return f
-    }()
-}
 ```
+
+**Do NOT hoist the formatter into a `static let`.** `ISO8601DateFormatter` is non-Sendable, so
+`extension ISO8601DateFormatter { static let filenameSafe = ... }` fails to compile under this
+package's Swift 6 strict concurrency with *"static property is not concurrency-safe because
+non-'Sendable' type may have shared mutable state"*. Instantiate it locally inside `create()`.
+`nonisolated(unsafe)` would compile but suppresses a real warning — `SessionStore` is an actor and
+nothing prevents concurrent `create()` calls against one shared formatter. The same applies to
+`DateFormatter` and `NumberFormatter` anywhere in this project.
 
 Note: colons from the ISO timestamp are legal in APFS filenames but display awkwardly in Finder. If `create` produces confusing names, replace `:` with `-` in `stamp` and re-run — the tests do not depend on the exact format, only that names sort chronologically.
 
@@ -1504,6 +1507,7 @@ git commit -m "feat: add storage and thermal capture policy"
 **Files:**
 - Create: `Packages/DeepSkyKit/Sources/DeepSkyCapture/CameraDevice.swift`
 - Create: `Packages/DeepSkyKit/Sources/DeepSkySynthetic/SyntheticDriver.swift`
+- Delete: `Packages/DeepSkyKit/Sources/DeepSkyCapture/DeepSkyCapture.swift` and `Packages/DeepSkyKit/Sources/DeepSkySynthetic/DeepSkySynthetic.swift` (the Task 1 placeholders — both targets now have real files, so the `*Module` enums are dead code)
 - Test: `Packages/DeepSkyKit/Tests/DeepSkySyntheticTests/SyntheticDriverTests.swift`
 
 **Interfaces:**
@@ -1604,7 +1608,7 @@ Expected: FAIL — "cannot find 'CaptureSettings' in scope".
 
 - [ ] **Step 3: Write minimal implementation**
 
-`Sources/DeepSkyCapture/CameraDevice.swift` — replace the placeholder file:
+`Sources/DeepSkyCapture/CameraDevice.swift` (new file; delete the placeholder `DeepSkyCapture.swift`):
 
 ```swift
 import Foundation
@@ -1662,7 +1666,7 @@ public protocol CameraDevice: Actor {
 }
 ```
 
-`Sources/DeepSkySynthetic/SyntheticDriver.swift` — replace the placeholder file:
+`Sources/DeepSkySynthetic/SyntheticDriver.swift` (new file; delete the placeholder `DeepSkySynthetic.swift`):
 
 ```swift
 import Foundation
