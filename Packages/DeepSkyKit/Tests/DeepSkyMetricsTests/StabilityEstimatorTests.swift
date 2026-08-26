@@ -68,4 +68,35 @@ private func wideFormat() -> FormatCapability {
     let r = StabilityEstimator.reading(rmsAngularRateRadPerSec: 0.01,
                                        exposureSeconds: 1.0, format: broken)
     #expect(r.predictedDriftPixels.isFinite)
+    #expect(r.band == .poor)
+}
+
+@Test func negativeFOVIsPoor() {
+    let broken = FormatCapability(width: 4032, height: 3024,
+                                  minExposureSeconds: 0.1, maxExposureSeconds: 1.0,
+                                  minISO: 55, maxISO: 12288,
+                                  horizontalFieldOfViewDegrees: -20,
+                                  maxPhotoDimensions: [[4032, 3024]], rawPixelFormats: [])
+    let r = StabilityEstimator.reading(rmsAngularRateRadPerSec: 0.01,
+                                       exposureSeconds: 1.0, format: broken)
+    #expect(r.predictedDriftPixels.isFinite)
+    #expect(r.band == .poor)
+}
+
+@Test func exactBoundaryAtHalfPixelIsGood() {
+    let f = wideFormat()
+    let ppr = Double(f.width) / (Double(f.horizontalFieldOfViewDegrees) * .pi / 180.0)
+
+    let exactHalf = StabilityEstimator.reading(
+        rmsAngularRateRadPerSec: 0.5 / ppr, exposureSeconds: 1.0, format: f)
+    #expect(exactHalf.band == .good)
+}
+
+@Test func exactBoundaryAtOnePointFivePixelsIsPoor() {
+    let f = wideFormat()
+    let ppr = Double(f.width) / (Double(f.horizontalFieldOfViewDegrees) * .pi / 180.0)
+
+    let exactOnePointFive = StabilityEstimator.reading(
+        rmsAngularRateRadPerSec: 1.5 / ppr, exposureSeconds: 1.0, format: f)
+    #expect(exactOnePointFive.band == .poor)
 }

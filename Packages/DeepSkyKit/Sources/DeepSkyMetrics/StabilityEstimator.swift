@@ -17,7 +17,10 @@ public enum StabilityEstimator {
         let drift = rmsAngularRateRadPerSec * exposureSeconds * pixelsPerRadian
 
         let band: StabilityBand
-        if drift < excellentPixels {
+        if fovRadians <= 0 || !fovRadians.isFinite {
+            // Degenerate format (zero, negative, or non-finite FOV): conservatively mark as unusable
+            band = .poor
+        } else if drift < excellentPixels {
             band = .excellent
         } else if drift < goodPixels {
             band = .good
