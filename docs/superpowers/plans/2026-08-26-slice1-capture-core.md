@@ -956,13 +956,14 @@ import DeepSkyCore
 public actor SessionStore {
     private let root: URL
     private let encoder: JSONEncoder
-    private let decoder: JSONDecoder
 
     public init(root: URL) {
         self.root = root
         self.encoder = JSONEncoder()
-        self.decoder = JSONDecoder()
     }
+
+    // No stored decoder: `readFrames` is `nonisolated static` and so cannot reach
+    // actor-isolated state — it constructs its own. A stored one would be dead.
 
     public func create(manifest: SessionManifest) throws -> URL {
         let stamp = ISO8601DateFormatter.filenameSafe.string(from: manifest.startedAt)
@@ -1033,14 +1034,15 @@ public actor SessionStore {
     }
 }
 
-extension ISO8601DateFormatter {
-    static let filenameSafe: ISO8601DateFormatter = {
-        let f = ISO8601DateFormatter()
-        f.formatOptions = [.withFullDate, .withTime, .withTimeZone]
-        return f
-    }()
-}
 ```
+
+**Do NOT hoist the formatter into a `static let`.** `ISO8601DateFormatter` is non-Sendable, so
+`extension ISO8601DateFormatter { static let filenameSafe = ... }` fails to compile under this
+package's Swift 6 strict concurrency with *"static property is not concurrency-safe because
+non-'Sendable' type may have shared mutable state"*. Instantiate it locally inside `create()`.
+`nonisolated(unsafe)` would compile but suppresses a real warning — `SessionStore` is an actor and
+nothing prevents concurrent `create()` calls against one shared formatter. The same applies to
+`DateFormatter` and `NumberFormatter` anywhere in this project.
 
 Note: colons from the ISO timestamp are legal in APFS filenames but display awkwardly in Finder. If `create` produces confusing names, replace `:` with `-` in `stamp` and re-run — the tests do not depend on the exact format, only that names sort chronologically.
 
