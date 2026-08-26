@@ -92,14 +92,17 @@ public struct SessionManifest: Sendable, Codable, Hashable {
     public let startedAt: Date
     public let plan: CapturePlan
     public let capabilities: DeviceCapabilities
+    public let settings: CaptureSettings
 
     public init(id: String, name: String, startedAt: Date,
-                plan: CapturePlan, capabilities: DeviceCapabilities) {
+                plan: CapturePlan, capabilities: DeviceCapabilities,
+                settings: CaptureSettings) {
         self.id = id
         self.name = name
         self.startedAt = startedAt
         self.plan = plan
         self.capabilities = capabilities
+        self.settings = settings
     }
 }
 
