@@ -93,7 +93,15 @@ public enum AutoStretch {
     }
 
     public static func map(_ image: FloatImage, measuredSigma: Double? = nil) -> FloatImage {
-        let p = parameters(for: image, measuredSigma: measuredSigma)
+        apply(parameters(for: image, measuredSigma: measuredSigma), to: image)
+    }
+
+    /// Applies an already-chosen stretch.
+    ///
+    /// Separate from `map` because colour needs one set of parameters applied
+    /// to all three channels: deriving them per channel would stretch each by
+    /// a different amount and shift every hue in the frame.
+    public static func apply(_ p: Parameters, to image: FloatImage) -> FloatImage {
         let span = max(1 - p.black, minimumSigma)
 
         // No sRGB transfer afterwards. The midtones function IS the stretch —

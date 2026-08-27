@@ -59,9 +59,21 @@ public enum BackgroundExtraction {
         return FloatImage(width: image.width, height: image.height, pixels: pixels) ?? image
     }
 
+    /// Subtracts a supplied surface, restoring the plane's own level so the
+    /// ramp goes but the brightness stays.
+    public static func subtract(_ surface: [Double], from image: FloatImage) -> FloatImage {
+        guard surface.count == image.pixels.count else { return image }
+        let level = AutoStretch.median(of: image.pixels)
+        var pixels = [Float](repeating: 0, count: image.pixels.count)
+        for i in 0..<pixels.count {
+            pixels[i] = image.pixels[i] - Float(surface[i]) + level
+        }
+        return FloatImage(width: image.width, height: image.height, pixels: pixels) ?? image
+    }
+
     /// The fitted background surface, one value per pixel, or nil when the fit
     /// is not constrained.
-    static func fitSurface(_ image: FloatImage) -> [Double]? {
+    public static func fitSurface(_ image: FloatImage) -> [Double]? {
         let samples = backgroundSamples(image)
         guard samples.count >= termCount * 2 else { return nil }
 

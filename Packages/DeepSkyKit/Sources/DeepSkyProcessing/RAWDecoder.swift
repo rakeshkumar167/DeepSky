@@ -27,6 +27,17 @@ public enum RAWDecoder {
     /// and the measurements that matter are scale-invariant. Full resolution
     /// follows once the numbers are right.
     public static func decodeLuminance(contentsOf url: URL, maxDimension: Int) throws -> FloatImage {
+        try decodeRGB(contentsOf: url, maxDimension: maxDimension).luminance
+    }
+
+    /// Decodes a RAW file to three linear colour planes.
+    ///
+    /// Colour is not decoration: it is most of what makes a night sky read as
+    /// a photograph rather than a sensor dump, and discarding it also discards
+    /// star temperature and any real nebula hue. The luminance path above is
+    /// now derived from this rather than decoded separately, so there is one
+    /// decode and one place where the RAW conversion is defined.
+    public static func decodeRGB(contentsOf url: URL, maxDimension: Int) throws -> RGBImage {
         guard let filter = CIRAWFilter(imageURL: url) else {
             throw DecodeError.notRAW(url.lastPathComponent)
         }
@@ -64,13 +75,19 @@ public enum RAWDecoder {
                            colorSpace: nil)
         }
 
-        var luminance = [Float](repeating: 0, count: width * height)
+        var red = [Float](repeating: 0, count: width * height)
+        var green = [Float](repeating: 0, count: width * height)
+        var blue = [Float](repeating: 0, count: width * height)
         for i in 0..<(width * height) {
-            let r = rgba[i * 4], g = rgba[i * 4 + 1], b = rgba[i * 4 + 2]
-            luminance[i] = 0.2126 * r + 0.7152 * g + 0.0722 * b
+            red[i] = rgba[i * 4]
+            green[i] = rgba[i * 4 + 1]
+            blue[i] = rgba[i * 4 + 2]
         }
 
-        guard let image = FloatImage(width: width, height: height, pixels: luminance) else {
+        guard let r = FloatImage(width: width, height: height, pixels: red),
+              let g = FloatImage(width: width, height: height, pixels: green),
+              let b = FloatImage(width: width, height: height, pixels: blue),
+              let image = RGBImage(red: r, green: g, blue: b) else {
             throw DecodeError.renderFailed(url.lastPathComponent)
         }
         return image

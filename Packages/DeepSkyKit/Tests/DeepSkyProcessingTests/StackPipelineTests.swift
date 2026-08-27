@@ -67,8 +67,8 @@ func reportsStackingMeasurementOnRealFrames() throws {
     let unaligned = try StackPipeline.run(frameURLs: frames, maxDimension: 512,
                                           align: false, progress: nil)
 
-    let stretchSingle = AutoStretch.parameters(for: result.singleFrame)
-    let stretchStacked = AutoStretch.parameters(for: result.stacked)
+    let stretchSingle = AutoStretch.parameters(for: result.singleFrame.luminance)
+    let stretchStacked = AutoStretch.parameters(for: result.stacked.luminance)
 
     print("""
 
@@ -86,8 +86,8 @@ func reportsStackingMeasurementOnRealFrames() throws {
     max drift           \(result.maxDriftPixels)px
 
     --- exposure ---
-    \(exposureReport(result.singleFrame, "single "))
-    \(exposureReport(result.stacked, "stacked"))
+    \(exposureReport(result.singleFrame.luminance, "single "))
+    \(exposureReport(result.stacked.luminance, "stacked"))
 
     --- autostretch ---
     single  sigma \(stretchSingle.sigma)  midtone \(stretchSingle.midtone)

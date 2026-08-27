@@ -197,3 +197,14 @@ public enum FrameAligner {
         return FloatImage(width: width, height: height, pixels: pixels)
     }
 }
+
+extension FrameAligner {
+    /// Translates all three planes by the same offset. Shifting channels
+    /// independently would fringe every star.
+    public static func shift(_ image: RGBImage, by offset: Offset) -> RGBImage? {
+        guard let r = shift(image.red, by: offset),
+              let g = shift(image.green, by: offset),
+              let b = shift(image.blue, by: offset) else { return nil }
+        return RGBImage(red: r, green: g, blue: b)
+    }
+}

@@ -10,7 +10,7 @@ import UniformTypeIdentifiers
 /// and needs a session on disk.
 struct RenderSamples {
 
-    fileprivate static func writePNG(_ image: FloatImage, to url: URL) throws {
+    static func writePNG(_ image: FloatImage, to url: URL) throws {
         var bytes = [UInt8](repeating: 0, count: image.width * image.height)
         for i in 0..<bytes.count {
             bytes[i] = UInt8(min(max(image.pixels[i], 0), 1) * 255)
@@ -31,8 +31,41 @@ struct RenderSamples {
         }
     }
 
+    static func writePNG(_ image: RGBImage, to url: URL) throws {
+        let count = image.width * image.height
+        var bytes = [UInt8](repeating: 0, count: count * 3)
+        for i in 0..<count {
+            bytes[i * 3] = UInt8(min(max(image.red.pixels[i], 0), 1) * 255)
+            bytes[i * 3 + 1] = UInt8(min(max(image.green.pixels[i], 0), 1) * 255)
+            bytes[i * 3 + 2] = UInt8(min(max(image.blue.pixels[i], 0), 1) * 255)
+        }
+        let provider = CGDataProvider(data: Data(bytes) as CFData)!
+        let space = CGColorSpace(name: CGColorSpace.sRGB)!
+        let cg = CGImage(width: image.width, height: image.height,
+                         bitsPerComponent: 8, bitsPerPixel: 24,
+                         bytesPerRow: image.width * 3, space: space,
+                         bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.none.rawValue),
+                         provider: provider, decode: nil,
+                         shouldInterpolate: true, intent: .defaultIntent)!
+        let destination = CGImageDestinationCreateWithURL(
+            url as CFURL, UTType.png.identifier as CFString, 1, nil)!
+        CGImageDestinationAddImage(destination, cg, nil)
+        guard CGImageDestinationFinalize(destination) else {
+            throw CocoaError(.fileWriteUnknown)
+        }
+    }
+
+    static func sideBySide(_ images: [RGBImage], gap: Int = 8) -> RGBImage? {
+        guard let planes = (0..<3).map({ plane in
+            sideBySide(images.map { $0.planes[plane] }, gap: gap)
+        }) as [FloatImage?]? , let r = planes[0], let g = planes[1], let b = planes[2] else {
+            return nil
+        }
+        return RGBImage(red: r, green: g, blue: b)
+    }
+
     /// Places images side by side with a thin divider, for one-glance comparison.
-    fileprivate static func sideBySide(_ images: [FloatImage], gap: Int = 8) -> FloatImage? {
+    static func sideBySide(_ images: [FloatImage], gap: Int = 8) -> FloatImage? {
         guard let first = images.first else { return nil }
         let height = first.height
         guard images.allSatisfy({ $0.height == height }) else { return nil }
@@ -84,13 +117,12 @@ struct RenderSamples {
 
         let result = try StackPipeline.run(frameURLs: urls, maxDimension: 1024, progress: nil)
 
-        let singleFlat = BackgroundExtraction.removeGradient(result.singleFrame)
-        let stackFlat = BackgroundExtraction.removeGradient(result.stacked)
-
-        let singleNew = AutoStretch.map(singleFlat, measuredSigma: result.temporalNoiseSingle)
-        let stackNew = AutoStretch.map(stackFlat, measuredSigma: result.temporalNoiseStacked)
-        let stackOld = Self.legacyStretch(result.stacked)
-        let singleOld = Self.legacyStretch(result.singleFrame)
+        let singleNew = ColourRender.display(result.singleFrame,
+                                             measuredSigma: result.temporalNoiseSingle)
+        let stackNew = ColourRender.display(result.stacked,
+                                            measuredSigma: result.temporalNoiseStacked)
+        let stackOld = RGBImage(grey: Self.legacyStretch(result.stacked.luminance))
+        let singleOld = RGBImage(grey: Self.legacyStretch(result.singleFrame.luminance))
 
         try Self.writePNG(singleNew, to: out.appendingPathComponent("1-single-frame.png"))
         try Self.writePNG(stackNew, to: out.appendingPathComponent("2-stack-\(result.framesUsed)-frames.png"))

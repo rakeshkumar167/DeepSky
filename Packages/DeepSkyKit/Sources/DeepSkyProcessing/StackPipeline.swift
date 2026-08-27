@@ -7,8 +7,8 @@ import Foundation
 /// better-looking image while gathering no extra signal. The numbers are how
 /// the difference is told.
 public struct StackResult: Sendable {
-    public let stacked: FloatImage
-    public let singleFrame: FloatImage
+    public let stacked: RGBImage
+    public let singleFrame: RGBImage
     public let framesUsed: Int
     public let framesFailed: Int
     /// Spatial σ over a patch. Retained for diagnostics only — it is dominated
@@ -75,8 +75,9 @@ public enum StackPipeline {
         align: Bool = true,
         progress: (@Sendable (Int, Int) -> Void)?
     ) throws -> StackResult {
-        var stacker: FrameStacker?
+        var stacker: RGBStacker?
         var reference: FloatImage?
+        var referenceFrame: RGBImage?
         var failed = 0
         var offsets: [Offset] = []
 
@@ -96,23 +97,28 @@ public enum StackPipeline {
             // screen must not leave it running.
             try Task.checkCancellation()
             defer { progress?(i + 1, frameURLs.count) }
-            guard let decoded = try? RAWDecoder.decodeLuminance(
+            guard let decoded = try? RAWDecoder.decodeRGB(
                     contentsOf: url, maxDimension: maxDimension) else {
                 failed += 1
                 continue
             }
+            // Alignment runs on luminance: it is one plane rather than three,
+            // and a translation estimated from colour would be the same answer
+            // for triple the work.
+            let decodedLuminance = decoded.luminance
             if stacker == nil {
-                stacker = FrameStacker(width: decoded.width, height: decoded.height)
+                stacker = RGBStacker(width: decoded.width, height: decoded.height)
                 evenHalf = FrameStacker(width: decoded.width, height: decoded.height)
                 oddHalf = FrameStacker(width: decoded.width, height: decoded.height)
-                reference = decoded
+                reference = decodedLuminance
+                referenceFrame = decoded
             }
             guard let reference else { failed += 1; continue }
 
             var frame = decoded
             if align, decoded.width == reference.width, decoded.height == reference.height {
                 let maxShift = max(Int(Double(reference.width) * maxShiftFraction), 1)
-                let drift = FrameAligner.estimateOffset(of: decoded, against: reference,
+                let drift = FrameAligner.estimateOffset(of: decodedLuminance, against: reference,
                                                         maxShift: maxShift)
                 offsets.append(drift)
                 if drift.x != 0 || drift.y != 0,
@@ -125,20 +131,26 @@ public enum StackPipeline {
             if stacker?.add(frame) == false {
                 failed += 1
             } else {
-                if accepted % 2 == 0 { evenHalf?.add(frame) } else { oddHalf?.add(frame) }
-                if firstPair.count < 2 { firstPair.append(frame) }
+                // Taken from the ALIGNED frame, so the noise measurement sees
+                // the same pixels the stack does.
+                let alignedLuminance = frame.luminance
+                if accepted % 2 == 0 { evenHalf?.add(alignedLuminance) }
+                else { oddHalf?.add(alignedLuminance) }
+                if firstPair.count < 2 { firstPair.append(alignedLuminance) }
                 accepted += 1
             }
         }
 
-        guard let stacker, let reference, let stacked = stacker.result() else {
+        guard let stacker, let reference, let referenceFrame,
+              let stacked = stacker.result() else {
             throw PipelineError.noFramesDecoded
         }
+        let stackedLuminance = stacked.luminance
 
         // Measure both images over the SAME region. Comparing different
         // regions would measure scene variation rather than noise.
         let patch = min(measurementPatch, min(stacked.width, stacked.height))
-        guard let region = NoiseMeasurement.backgroundRegion(stacked, size: patch) else {
+        guard let region = NoiseMeasurement.backgroundRegion(stackedLuminance, size: patch) else {
             throw PipelineError.noBackgroundRegion
         }
 
@@ -154,11 +166,11 @@ public enum StackPipeline {
 
         return StackResult(
             stacked: stacked,
-            singleFrame: reference,
+            singleFrame: referenceFrame,
             framesUsed: stacker.frameCount,
             framesFailed: failed,
             noiseSingle: NoiseMeasurement.standardDeviation(reference, in: region),
-            noiseStacked: NoiseMeasurement.standardDeviation(stacked, in: region),
+            noiseStacked: NoiseMeasurement.standardDeviation(stackedLuminance, in: region),
             temporalNoiseSingle: firstPair.count >= 2
                 ? TemporalNoise.perFrame(firstPair[0], firstPair[1], in: region)
                 : nil,

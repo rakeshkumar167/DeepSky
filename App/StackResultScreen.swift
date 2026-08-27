@@ -91,11 +91,10 @@ struct StackResultScreen: View {
         // sits closer to the background and faint signal is lifted further.
         // Handing both the same sigma would hide exactly what stacking bought.
         let sigma = showingStacked ? result.temporalNoiseStacked : result.temporalNoiseSingle
-        let flattened = BackgroundExtraction.removeGradient(image)
         let rendered = stretch == .auto
-            ? AutoStretch.map(flattened, measuredSigma: sigma)
-            : ToneMapper.map(image)
-        if let cg = GrayImageRenderer.cgImage(rendered) {
+            ? ColourRender.display(image, measuredSigma: sigma)
+            : image.map { ToneMapper.map($0) }
+        if let cg = RGBImageRenderer.cgImage(rendered) {
             Image(decorative: cg, scale: 1, orientation: .up)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
@@ -227,19 +226,26 @@ struct StackResultScreen: View {
     }
 }
 
-/// Renders a single-channel float image to a displayable CGImage.
-enum GrayImageRenderer {
-    static func cgImage(_ image: FloatImage) -> CGImage? {
-        var bytes = [UInt8](repeating: 0, count: image.width * image.height)
-        for i in 0..<bytes.count {
-            bytes[i] = UInt8(min(max(image.pixels[i], 0), 1) * 255)
+/// Renders three float planes to a displayable CGImage.
+///
+/// sRGB rather than a linear space: `ColourRender` has already taken the data
+/// to display-referred values, so tagging it linear would make the system
+/// apply a second transfer and wash the result out.
+enum RGBImageRenderer {
+    static func cgImage(_ image: RGBImage) -> CGImage? {
+        let count = image.width * image.height
+        var bytes = [UInt8](repeating: 0, count: count * 3)
+        for i in 0..<count {
+            bytes[i * 3] = UInt8(min(max(image.red.pixels[i], 0), 1) * 255)
+            bytes[i * 3 + 1] = UInt8(min(max(image.green.pixels[i], 0), 1) * 255)
+            bytes[i * 3 + 2] = UInt8(min(max(image.blue.pixels[i], 0), 1) * 255)
         }
         guard let provider = CGDataProvider(data: Data(bytes) as CFData),
-              let space = CGColorSpace(name: CGColorSpace.genericGrayGamma2_2) else { return nil }
+              let space = CGColorSpace(name: CGColorSpace.sRGB) else { return nil }
         return CGImage(width: image.width, height: image.height,
-                       bitsPerComponent: 8, bitsPerPixel: 8,
-                       bytesPerRow: image.width, space: space,
-                       bitmapInfo: CGBitmapInfo(rawValue: 0),
+                       bitsPerComponent: 8, bitsPerPixel: 24,
+                       bytesPerRow: image.width * 3, space: space,
+                       bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.none.rawValue),
                        provider: provider, decode: nil,
                        shouldInterpolate: true, intent: .defaultIntent)
     }
