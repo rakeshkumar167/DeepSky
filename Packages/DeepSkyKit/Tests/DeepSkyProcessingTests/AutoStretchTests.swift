@@ -52,11 +52,60 @@ struct AutoStretchTests {
         let noisy = noisyField(size: 128, level: 0.2, sigma: 0.02, seed: 5)
         let clean = noisyField(size: 128, level: 0.2, sigma: 0.005, seed: 5)
 
-        let noisyGain = AutoStretch.parameters(for: noisy).gain
-        let cleanGain = AutoStretch.parameters(for: clean).gain
+        // A SMALLER midtone is a more aggressive stretch: it is the input that
+        // maps to 0.5, so pulling it down lifts everything below it.
+        let noisyMidtone = AutoStretch.parameters(for: noisy).midtone
+        let cleanMidtone = AutoStretch.parameters(for: clean).midtone
 
-        #expect(cleanGain > noisyGain * 2,
-                "clean gain \(cleanGain) should far exceed noisy gain \(noisyGain)")
+        #expect(cleanMidtone < noisyMidtone / 2,
+                "clean midtone \(cleanMidtone) should be far below noisy \(noisyMidtone)")
+    }
+
+    /// The stretch must scale with the noise it is given, not with the image's
+    /// own histogram spread — that is the whole reason a stack looks better
+    /// than a frame. Same image, three times less noise, three times harder
+    /// stretch.
+    @Test func aMeasuredSigmaDrivesTheStretchInsteadOfTheHistogram() {
+        let image = noisyField(size: 128, level: 0.2, sigma: 0.02, seed: 3)
+
+        let asSingle = AutoStretch.parameters(for: image, measuredSigma: 0.003)
+        let asStack = AutoStretch.parameters(for: image, measuredSigma: 0.001)
+
+        #expect(asStack.midtone < asSingle.midtone,
+                "lower measured noise must stretch harder")
+        #expect(asStack.black > asSingle.black,
+                "lower measured noise must clip closer to the background")
+    }
+
+    /// Both images land their background on the same target — that is the
+    /// definition of the stretch. The difference has to show up in the faint
+    /// signal above it, not in the background level.
+    @Test func theBackgroundLandsOnTheTargetRegardlessOfNoise() {
+        let image = noisyField(size: 128, level: 0.2, sigma: 0.02, seed: 4)
+        for sigma in [0.0005, 0.002, 0.01] {
+            let mapped = AutoStretch.map(image, measuredSigma: sigma)
+            let median = AutoStretch.median(of: mapped.pixels)
+            #expect(abs(median - AutoStretch.targetBackground) < 0.02,
+                    "sigma \(sigma) landed background at \(median)")
+        }
+    }
+
+    /// The user-visible consequence, stated in absolute terms: a fixed faint
+    /// signal is lifted higher when the noise behind it is lower.
+    @Test func aFixedFaintSignalIsLiftedHigherWhenNoiseIsLower() {
+        let level: Float = 0.2
+        let signal: Float = 0.2 + 0.004
+        let image = noisyField(size: 64, level: level, sigma: 0.001, seed: 9)
+
+        func lifted(_ sigma: Double) -> Float {
+            let p = AutoStretch.parameters(for: image, measuredSigma: sigma)
+            let span = max(1 - p.black, 1e-6)
+            return MidtonesTransfer.apply(min(max((signal - p.black) / span, 0), 1),
+                                          midtone: p.midtone)
+        }
+
+        #expect(lifted(0.001) > lifted(0.004),
+                "the same signal must come out brighter from a quieter image")
     }
 
     /// The user-visible consequence: faint detail that is buried in a noisy frame

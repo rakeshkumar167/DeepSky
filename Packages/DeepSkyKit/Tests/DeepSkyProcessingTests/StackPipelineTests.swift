@@ -90,9 +90,9 @@ func reportsStackingMeasurementOnRealFrames() throws {
     \(exposureReport(result.stacked, "stacked"))
 
     --- autostretch ---
-    single  sigma \(stretchSingle.sigma)  gain \(stretchSingle.gain)
-    stacked sigma \(stretchStacked.sigma)  gain \(stretchStacked.gain)
-    stack tolerates \(stretchStacked.gain / max(stretchSingle.gain, 1e-9))x the stretch
+    single  sigma \(stretchSingle.sigma)  midtone \(stretchSingle.midtone)
+    stacked sigma \(stretchStacked.sigma)  midtone \(stretchStacked.midtone)
+    (a smaller midtone is a harder stretch)
     =======================================
 
     """)

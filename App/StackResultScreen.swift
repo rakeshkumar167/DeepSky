@@ -86,7 +86,15 @@ struct StackResultScreen: View {
     @ViewBuilder
     private func comparison(_ result: StackResult) -> some View {
         let image = showingStacked ? result.stacked : result.singleFrame
-        let rendered = stretch == .auto ? AutoStretch.map(image) : ToneMapper.map(image)
+        // Each image is stretched against ITS OWN measured noise. That is the
+        // entire mechanism: the stack's noise is lower, so its black point
+        // sits closer to the background and faint signal is lifted further.
+        // Handing both the same sigma would hide exactly what stacking bought.
+        let sigma = showingStacked ? result.temporalNoiseStacked : result.temporalNoiseSingle
+        let flattened = BackgroundExtraction.removeGradient(image)
+        let rendered = stretch == .auto
+            ? AutoStretch.map(flattened, measuredSigma: sigma)
+            : ToneMapper.map(image)
         if let cg = GrayImageRenderer.cgImage(rendered) {
             Image(decorative: cg, scale: 1, orientation: .up)
                 .resizable()
@@ -157,11 +165,11 @@ struct StackResultScreen: View {
                 body: "They were skipped. The rest of the session stacked normally.")
         }
 
-        if stretch == .auto, let stacked = stretchGain(result.stacked),
-           let single = stretchGain(result.singleFrame), single > 0 {
-            Text(String(format: "The stack tolerates %.1f× the stretch of a single frame.",
-                        stacked / single))
+        if stretch == .auto, let improvement = result.temporalImprovement, improvement > 1 {
+            Text(String(format: "Lower noise lets the stack clip %.1f× closer to the background — that is where the faint detail comes from.",
+                        improvement))
                 .font(.system(size: 12, weight: .medium))
+                .multilineTextAlignment(.center)
                 .foregroundStyle(DS.secondaryText(nightMode))
                 .padding(.top, DS.xs)
         }
@@ -183,11 +191,6 @@ struct StackResultScreen: View {
         }
         .padding(DS.md)
         .background(DS.surface, in: RoundedRectangle(cornerRadius: DS.radius))
-    }
-
-    private func stretchGain(_ image: FloatImage) -> Double? {
-        let gain = AutoStretch.parameters(for: image).gain
-        return gain.isFinite ? Double(gain) : nil
     }
 
     private func improvementColour(_ result: StackResult) -> Color {
