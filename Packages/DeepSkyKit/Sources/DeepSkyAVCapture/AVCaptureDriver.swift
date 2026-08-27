@@ -83,7 +83,23 @@ public actor AVCaptureDriver: CameraDevice {
     /// watchdog for a photo that will never arrive, not a performance budget.
     static let frameTimeoutSeconds = 20.0
 
-    private let session = AVCaptureSession()
+    /// The session backing both capture and the on-screen preview.
+    ///
+    /// `nonisolated(unsafe)` rather than actor-isolated state, deliberately.
+    /// An `AVCaptureVideoPreviewLayer` lives on the main actor and needs a
+    /// direct reference to the session; `AVCaptureSession` is not `Sendable`,
+    /// so isolated state could never reach it and the preview could never be
+    /// wired to the session actually taking the photographs.
+    ///
+    /// The escape hatch is narrow and honest about what is already true —
+    /// AVFoundation uses this object from its own queues regardless. Every
+    /// mutation of the session's *configuration* still happens inside the
+    /// actor; the preview layer only holds the reference and renders frames.
+    nonisolated(unsafe) let session = AVCaptureSession()
+
+    /// The running session, for attaching a preview layer on the main actor.
+    public nonisolated var previewSession: AVCaptureSession { session }
+
     private let output = AVCapturePhotoOutput()
     private let device: AVCaptureDevice
     private var applied: CaptureSettings?

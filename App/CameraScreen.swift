@@ -8,9 +8,10 @@ import DeepSkyCore
 /// everything else is decided by the preset, which is the whole point of the
 /// MVP's control scope.
 ///
-/// The live view is still a procedural star field — the preview output path is
-/// deferred to Plan B — so it is labelled as simulated rather than allowed to
-/// masquerade as a camera feed.
+/// The live view is the real camera feed, sharing the capture session so it
+/// shows the frame at the settings the app will actually shoot with. The
+/// procedural star field remains only as the placeholder shown while the
+/// hardware is being probed, and the badge says which of the two is on screen.
 struct CameraScreen: View {
     @Binding var nightMode: Bool
 
@@ -20,7 +21,15 @@ struct CameraScreen: View {
     var body: some View {
         ZStack {
             DS.background.ignoresSafeArea()
-            LiveViewPlaceholder(nightMode: nightMode).ignoresSafeArea()
+            // The real feed as soon as the session exists; the procedural
+            // field only covers the probe, so the screen is never empty.
+            if let session = model.previewSession {
+                CameraPreview(session: session)
+                    .ignoresSafeArea()
+                    .transition(.opacity)
+            } else {
+                LiveViewPlaceholder(nightMode: nightMode).ignoresSafeArea()
+            }
 
             if showLoupe { FocusLoupe(nightMode: nightMode, sharpness: sharpness) }
 
@@ -67,10 +76,13 @@ struct CameraScreen: View {
             }
 
             HStack(spacing: DS.md) {
-                // Honest about what the live view is, so nobody judges focus by it.
-                Label("Simulated view", systemImage: "eye.slash")
+                // Says which of the two it is, so nobody judges focus by a
+                // simulation — or dismisses the real feed as one.
+                Label(model.previewSession == nil ? "Simulated view" : "Live view",
+                      systemImage: model.previewSession == nil ? "eye.slash" : "eye")
                     .font(.system(size: 10, weight: .medium))
-                    .foregroundStyle(DS.secondaryText(nightMode))
+                    .foregroundStyle(model.previewSession == nil
+                                     ? DS.secondaryText(nightMode) : DS.accent(nightMode))
                 Spacer()
                 HistogramStrip(nightMode: nightMode)
             }

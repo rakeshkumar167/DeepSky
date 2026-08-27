@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import UIKit
+import AVFoundation
 import DeepSkyCore
 import DeepSkyCapture
 import DeepSkySession
@@ -30,6 +31,10 @@ final class CaptureModel {
     private(set) var lensName = "—"
     private(set) var maxFrames = 1
     private(set) var lastSessionURL: URL?
+
+    /// The live session, once the hardware has been probed. Nil until then —
+    /// the screen shows a placeholder rather than an empty black rectangle.
+    private(set) var previewSession: AVCaptureSession?
 
     var requestedFrames = 1
     var lensPosition = 1.0
@@ -73,6 +78,10 @@ final class CaptureModel {
             }
 
             let driver = try AVCaptureDriver(lensIndex: index)
+            // Publish the session before metering: the preview can start
+            // rendering during the 1.5s auto-exposure settle rather than
+            // making the user stare at a placeholder through it.
+            self.previewSession = driver.previewSession
             await driver.start()
 
             // Metering needs the session running, so this must follow start().
