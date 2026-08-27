@@ -35,6 +35,11 @@ struct StackResultScreen: View {
     @State private var showingStacked = true
     @State private var stretch: StretchMode = .auto
     @State private var framesDone = 0
+    /// Spec §18's OFF ─── MAX control. Zero by default: an enhancement the
+    /// user did not ask for is a claim about their photograph.
+    @State private var enhancement = 0.0
+    /// The rendered picture, produced off the main actor.
+    @State private var displayImage: CGImage?
     @State private var errorMessage: String?
 
     var body: some View {
@@ -54,6 +59,7 @@ struct StackResultScreen: View {
         .navigationTitle("Stacked result")
         .navigationBarTitleDisplayMode(.inline)
         .task { await stack() }
+        .task(id: renderKey) { await refreshDisplay() }
         .sheet(item: $exportedFile) { file in
             ShareSheet(url: file.url)
         }
@@ -92,28 +98,69 @@ struct StackResultScreen: View {
         .padding(.vertical, DS.xl)
     }
 
-    /// Exactly what is on screen, so an export is never a different picture
-    /// from the one the user was looking at when they tapped Export.
-    private func renderedImage(_ result: StackResult) -> RGBImage {
-        let image = showingStacked ? result.stacked : result.singleFrame
+    /// Everything the displayed picture depends on.
+    ///
+    /// `.task(id:)` keys off this, which gives cancellation-based debouncing
+    /// for free: dragging the slider supersedes the in-flight render rather
+    /// than queueing a hundred of them.
+    private struct RenderKey: Equatable {
+        let stacked: Bool
+        let stretch: StretchMode
+        let enhancement: Double
+        /// Included so the FIRST render is triggered too. Without it the key
+        /// never changes when stacking finishes, and the picture never appears.
+        let ready: Bool
+    }
+
+    private var renderKey: RenderKey {
+        RenderKey(stacked: showingStacked, stretch: stretch,
+                  enhancement: enhancement, ready: result != nil)
+    }
+
+    /// Pure and `nonisolated`, so it can run off the main actor.
+    ///
+    /// It has to: the stretch and the local-contrast pass together take about
+    /// a tenth of a second at this resolution, and doing that inside a view
+    /// body would stutter the slider it is driven by.
+    nonisolated private static func render(_ result: StackResult, key: RenderKey) -> RGBImage {
+        let image = key.stacked ? result.stacked : result.singleFrame
         // Each image is stretched against ITS OWN measured noise. That is the
         // entire mechanism: the stack's noise is lower, so its black point
         // sits closer to the background and faint signal is lifted further.
         // Handing both the same sigma would hide exactly what stacking bought.
-        let sigma = showingStacked ? result.temporalNoiseStacked : result.temporalNoiseSingle
-        return stretch == .auto
+        let sigma = key.stacked ? result.temporalNoiseStacked : result.temporalNoiseSingle
+        let rendered = key.stretch == .auto
             ? ColourRender.display(image, measuredSigma: sigma)
             : image.map { ToneMapper.map($0) }
+        // Applied last, on display-referred data: local contrast is a look
+        // control and behaves predictably against the midtones the viewer
+        // actually sees, not against linear sensor values.
+        return MilkyWayEnhance.apply(rendered, amount: Float(key.enhancement))
+    }
+
+    private func refreshDisplay() async {
+        guard let result else { return }
+        let key = renderKey
+        let image = await Task.detached(priority: .userInitiated) {
+            Self.render(result, key: key)
+        }.value
+        guard !Task.isCancelled else { return }
+        displayImage = RGBImageRenderer.cgImage(image)
     }
 
     @ViewBuilder
     private func comparison(_ result: StackResult) -> some View {
-        let rendered = renderedImage(result)
-        if let cg = RGBImageRenderer.cgImage(rendered) {
+        if let cg = displayImage {
             Image(decorative: cg, scale: 1, orientation: .up)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .clipShape(RoundedRectangle(cornerRadius: DS.radius))
+        } else {
+            // Only while a re-render is in flight, so it should barely be seen.
+            RoundedRectangle(cornerRadius: DS.radius)
+                .fill(DS.surface)
+                .aspectRatio(3.0 / 4.0, contentMode: .fit)
+                .overlay { ProgressView().tint(DS.accent(nightMode)) }
         }
 
         Picker("", selection: $showingStacked) {
@@ -179,6 +226,8 @@ struct StackResultScreen: View {
                 body: "They were skipped. The rest of the session stacked normally.")
         }
 
+        enhancementSlider
+
         exportSection(result)
 
         if stretch == .auto, let improvement = result.temporalImprovement, improvement > 1 {
@@ -189,6 +238,30 @@ struct StackResultScreen: View {
                 .foregroundStyle(DS.secondaryText(nightMode))
                 .padding(.top, DS.xs)
         }
+    }
+
+    /// Spec §18. Band-limited local contrast, so it lifts structure that was
+    /// photographed and leaves noise and stars alone.
+    private var enhancementSlider: some View {
+        VStack(alignment: .leading, spacing: DS.xs) {
+            HStack {
+                Text("MILKY WAY").label(9)
+                    .foregroundStyle(DS.secondaryText(nightMode))
+                Spacer()
+                Text(enhancement == 0 ? "OFF" : String(format: "%.0f%%", enhancement * 100))
+                    .readout(13)
+                    .foregroundStyle(enhancement == 0
+                                     ? DS.secondaryText(nightMode) : DS.accent(nightMode))
+            }
+            Slider(value: $enhancement, in: 0...1)
+                .tint(DS.accent(nightMode))
+            Text("Amplifies structure already in the frame. It cannot add detail that was not photographed — on a blank sky this does nothing.")
+                .font(.system(size: 11))
+                .foregroundStyle(DS.secondaryText(nightMode))
+        }
+        .padding(DS.md)
+        .background(DS.surface, in: RoundedRectangle(cornerRadius: DS.radius))
+        .padding(.top, DS.sm)
     }
 
     /// Exports the processed image — spec §36. The RAW frames already leave
@@ -233,7 +306,7 @@ struct StackResultScreen: View {
 
     private func export(_ result: StackResult, as format: ImageExport.Format) {
         exportError = nil
-        let image = renderedImage(result)
+        let key = renderKey
         let name = sessionName
         let frames = showingStacked ? result.framesUsed : 1
 
@@ -242,9 +315,12 @@ struct StackResultScreen: View {
                 // Encoding a 16-bit TIFF is not free; keep it off the main
                 // actor so the sheet does not appear after a visible stall.
                 let url = try await Task.detached(priority: .userInitiated) {
-                    try ImageExport.write(image, format: format,
-                                          sessionName: name, frameCount: frames,
-                                          to: URL.temporaryDirectory)
+                    // Re-rendered from the same key, so the file is exactly
+                    // the picture on screen rather than a near-miss.
+                    let image = Self.render(result, key: key)
+                    return try ImageExport.write(image, format: format,
+                                                 sessionName: name, frameCount: frames,
+                                                 to: URL.temporaryDirectory)
                 }.value
                 exportedFile = ExportedFile(url: url)
             } catch {
