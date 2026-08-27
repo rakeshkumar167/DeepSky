@@ -261,7 +261,8 @@ private struct SessionDetail: View {
                     NavigationLink {
                         StackResultScreen(frameURLs: session.frameURLs,
                                           nightMode: nightMode,
-                                          motionFlaggedFraction: session.motionFlaggedFraction)
+                                          motionFlaggedFraction: session.motionFlaggedFraction,
+                                          sessionName: session.name)
                     } label: {
                         Label("Stack \(session.framesWritten) frames", systemImage: "square.3.layers.3d")
                     }

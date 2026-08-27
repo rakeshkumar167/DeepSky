@@ -12,6 +12,12 @@ struct StackResultScreen: View {
     let nightMode: Bool
     /// Fraction of the session's frames flagged for movement, from the manifest.
     let motionFlaggedFraction: Double
+    /// Used to name exported files, so a file still says where it came from
+    /// once it has left the app.
+    var sessionName: String = "DeepSky"
+
+    @State private var exportedFile: ExportedFile?
+    @State private var exportError: String?
 
     /// How each image is rendered for display.
     enum StretchMode: String, CaseIterable {
@@ -48,6 +54,9 @@ struct StackResultScreen: View {
         .navigationTitle("Stacked result")
         .navigationBarTitleDisplayMode(.inline)
         .task { await stack() }
+        .sheet(item: $exportedFile) { file in
+            ShareSheet(url: file.url)
+        }
     }
 
     /// Determinate, and driven by the pipeline's own per-frame callback.
@@ -83,17 +92,23 @@ struct StackResultScreen: View {
         .padding(.vertical, DS.xl)
     }
 
-    @ViewBuilder
-    private func comparison(_ result: StackResult) -> some View {
+    /// Exactly what is on screen, so an export is never a different picture
+    /// from the one the user was looking at when they tapped Export.
+    private func renderedImage(_ result: StackResult) -> RGBImage {
         let image = showingStacked ? result.stacked : result.singleFrame
         // Each image is stretched against ITS OWN measured noise. That is the
         // entire mechanism: the stack's noise is lower, so its black point
         // sits closer to the background and faint signal is lifted further.
         // Handing both the same sigma would hide exactly what stacking bought.
         let sigma = showingStacked ? result.temporalNoiseStacked : result.temporalNoiseSingle
-        let rendered = stretch == .auto
+        return stretch == .auto
             ? ColourRender.display(image, measuredSigma: sigma)
             : image.map { ToneMapper.map($0) }
+    }
+
+    @ViewBuilder
+    private func comparison(_ result: StackResult) -> some View {
+        let rendered = renderedImage(result)
         if let cg = RGBImageRenderer.cgImage(rendered) {
             Image(decorative: cg, scale: 1, orientation: .up)
                 .resizable()
@@ -164,6 +179,8 @@ struct StackResultScreen: View {
                 body: "They were skipped. The rest of the session stacked normally.")
         }
 
+        exportSection(result)
+
         if stretch == .auto, let improvement = result.temporalImprovement, improvement > 1 {
             Text(String(format: "Lower noise lets the stack clip %.1f× closer to the background — that is where the faint detail comes from.",
                         improvement))
@@ -171,6 +188,68 @@ struct StackResultScreen: View {
                 .multilineTextAlignment(.center)
                 .foregroundStyle(DS.secondaryText(nightMode))
                 .padding(.top, DS.xs)
+        }
+    }
+
+    /// Exports the processed image — spec §36. The RAW frames already leave
+    /// via the session folder; this is the picture itself.
+    @ViewBuilder
+    private func exportSection(_ result: StackResult) -> some View {
+        VStack(spacing: DS.sm) {
+            Menu {
+                ForEach(ImageExport.Format.allCases, id: \.self) { format in
+                    Button {
+                        export(result, as: format)
+                    } label: {
+                        // The summary is what makes the choice answerable
+                        // without already knowing the formats.
+                        Text("\(format.displayName) — \(format.summary)")
+                    }
+                }
+            } label: {
+                Label("Export image", systemImage: "square.and.arrow.up")
+                    .font(.system(size: 15, weight: .semibold))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, DS.sm)
+                    .background(DS.surface, in: RoundedRectangle(cornerRadius: DS.radius))
+            }
+            .foregroundStyle(DS.accent(nightMode))
+
+            // Stated rather than hidden: the pipeline still processes at 1024px,
+            // so an export is that size and not the sensor's 12MP.
+            Text("Exports the image shown, at \(result.stacked.width)×\(result.stacked.height). Full-resolution processing is not built yet.")
+                .font(.system(size: 11))
+                .multilineTextAlignment(.center)
+                .foregroundStyle(DS.secondaryText(nightMode))
+
+            if let exportError {
+                Text(exportError)
+                    .font(.system(size: 11))
+                    .foregroundStyle(DS.status(2, night: nightMode))
+            }
+        }
+        .padding(.top, DS.sm)
+    }
+
+    private func export(_ result: StackResult, as format: ImageExport.Format) {
+        exportError = nil
+        let image = renderedImage(result)
+        let name = sessionName
+        let frames = showingStacked ? result.framesUsed : 1
+
+        Task {
+            do {
+                // Encoding a 16-bit TIFF is not free; keep it off the main
+                // actor so the sheet does not appear after a visible stall.
+                let url = try await Task.detached(priority: .userInitiated) {
+                    try ImageExport.write(image, format: format,
+                                          sessionName: name, frameCount: frames,
+                                          to: URL.temporaryDirectory)
+                }.value
+                exportedFile = ExportedFile(url: url)
+            } catch {
+                exportError = "Could not export \(format.displayName): \(error)"
+            }
         }
     }
 
