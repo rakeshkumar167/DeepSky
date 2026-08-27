@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- DeepSky has no networking of any kind. Nothing leaves the device. -->
+	<key>NSPrivacyTracking</key>
+	<false/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array/>
+
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array>
+		<!--
+		  Disk space. `DeviceEnvironmentSensor.freeBytes` and the Sessions
+		  screen read volumeAvailableCapacityForImportantUsage, and
+		  `CapturePolicy` refuses to start or continue a session that would
+		  not fit. E174.1 is exactly that: checking available space before
+		  writing files.
+		-->
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryDiskSpace</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>E174.1</string>
+			</array>
+		</dict>
+
+		<!--
+		  UserDefaults, via @AppStorage("nightMode") in RootView. Read and
+		  written only by this app, with no app group involved, which is
+		  CA92.1.
+		-->
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>CA92.1</string>
+			</array>
+		</dict>
+
+		<!--
+		  Deliberately NOT declared: file timestamp APIs. Session dates come
+		  from `startedAt` inside each session.json, not from the filesystem,
+		  so no timestamp API is called. Declaring a category we do not use
+		  would be a false statement in a privacy manifest.
+		-->
+	</array>
+</dict>
+</plist>
