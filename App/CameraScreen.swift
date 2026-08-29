@@ -12,12 +12,23 @@ import DeepSkyCore
 /// shows the frame at the settings the app will actually shoot with. The
 /// procedural star field remains only as the placeholder shown while the
 /// hardware is being probed, and the badge says which of the two is on screen.
+private struct BottomControlsHeightKey: PreferenceKey {
+    static let defaultValue: CGFloat = 260
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
 struct CameraScreen: View {
     @Binding var nightMode: Bool
 
     @State private var model = CaptureModel()
     @State private var showLoupe = false
     @AppStorage("hasSeenShutterSoundTip") private var hasSeenShutterSoundTip = false
+    /// Matches the control strip + capture row's actual height, measured via
+    /// `BottomControlsHeightKey` below — falls back to the loupe's old fixed
+    /// offset only until the first layout pass reports the real value.
+    @State private var bottomControlsHeight: CGFloat = 260
 
     var body: some View {
         ZStack {
@@ -32,22 +43,39 @@ struct CameraScreen: View {
                 LiveViewPlaceholder(nightMode: nightMode).ignoresSafeArea()
             }
 
-            if showLoupe { FocusLoupe(nightMode: nightMode, sharpness: sharpness) }
+            if showLoupe {
+                FocusLoupe(nightMode: nightMode, sharpness: sharpness, bottomInset: bottomControlsHeight)
+            }
 
             VStack(spacing: 0) {
                 statusBar
                 Spacer()
                 phaseContent
-                controlStrip
-                if !hasSeenShutterSoundTip, case .ready = model.phase {
-                    shutterSoundTip
-                }
-                captureRow
+                bottomControls
             }
             .padding(.horizontal, DS.md)
             .padding(.bottom, DS.sm)
         }
         .task { await model.prepare() }
+    }
+
+    /// Grouped so its live-measured height can position `FocusLoupe` above
+    /// it, instead of a fixed offset that drifts whenever this group's
+    /// content changes.
+    private var bottomControls: some View {
+        VStack(spacing: 0) {
+            controlStrip
+            if !hasSeenShutterSoundTip, case .ready = model.phase {
+                shutterSoundTip
+            }
+            captureRow
+        }
+        .background(
+            GeometryReader { geo in
+                Color.clear.preference(key: BottomControlsHeightKey.self, value: geo.size.height)
+            }
+        )
+        .onPreferenceChange(BottomControlsHeightKey.self) { bottomControlsHeight = $0 }
     }
 
     // MARK: - Top status

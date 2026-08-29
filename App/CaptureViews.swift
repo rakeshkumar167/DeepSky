@@ -61,6 +61,11 @@ struct LiveViewPlaceholder: View {
 struct FocusLoupe: View {
     let nightMode: Bool
     let sharpness: Double
+    /// Height of the control strip + capture row this screen currently has
+    /// on screen below the loupe, measured live rather than guessed — that
+    /// group's height changes (tips, phase text, Dynamic Type), and a fixed
+    /// offset drifts out of sync and overlaps it.
+    let bottomInset: CGFloat
 
     var body: some View {
         VStack {
@@ -96,7 +101,7 @@ struct FocusLoupe: View {
             }
             .padding(DS.lg)
             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: DS.radius))
-            .padding(.bottom, 260)
+            .padding(.bottom, bottomInset + DS.sm)
         }
         .transition(.opacity.combined(with: .scale(scale: 0.94)))
         .allowsHitTesting(false)
