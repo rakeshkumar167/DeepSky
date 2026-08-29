@@ -17,6 +17,7 @@ struct CameraScreen: View {
 
     @State private var model = CaptureModel()
     @State private var showLoupe = false
+    @AppStorage("hasSeenShutterSoundTip") private var hasSeenShutterSoundTip = false
 
     var body: some View {
         ZStack {
@@ -38,6 +39,9 @@ struct CameraScreen: View {
                 Spacer()
                 phaseContent
                 controlStrip
+                if !hasSeenShutterSoundTip, case .ready = model.phase {
+                    shutterSoundTip
+                }
                 captureRow
             }
             .padding(.horizontal, DS.md)
@@ -116,6 +120,15 @@ struct CameraScreen: View {
 
         case .ready:
             planStrip
+
+        case .countdown(let remaining):
+            VStack(spacing: DS.xs) {
+                Text("\(remaining)").readout(28, weight: .bold)
+                    .foregroundStyle(DS.accent(nightMode))
+                Text("Hold steady…")
+                    .font(.system(size: 11)).foregroundStyle(DS.secondaryText(nightMode))
+            }
+            .padding(.vertical, DS.md)
 
         case .capturing(let done, let total):
             captureProgress(done: done, total: total)
@@ -262,6 +275,34 @@ struct CameraScreen: View {
 
     // MARK: - Capture
 
+    /// iOS plays the system shutter sound on every `AVCapturePhotoOutput`
+    /// capture and gives apps no API to suppress it — enforced at the OS
+    /// level so apps can't shoot silently. The mute switch is the only real
+    /// control the user has over it (outside regions where iOS ignores the
+    /// switch for the camera).
+    private var shutterSoundTip: some View {
+        HStack(spacing: DS.sm) {
+            Image(systemName: "speaker.slash.fill")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(DS.secondaryText(nightMode))
+            Text("iOS plays a shutter sound per frame during RAW capture — flip the mute switch to silence it.")
+                .font(.system(size: 11))
+                .foregroundStyle(DS.secondaryText(nightMode))
+            Spacer(minLength: 0)
+            Button {
+                hasSeenShutterSoundTip = true
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(DS.secondaryText(nightMode))
+            }
+            .accessibilityLabel("Dismiss shutter sound tip")
+        }
+        .padding(.horizontal, DS.md)
+        .padding(.vertical, DS.sm)
+        .background(DS.surfaceRaised, in: RoundedRectangle(cornerRadius: DS.radius))
+    }
+
     private var captureRow: some View {
         HStack {
             Spacer()
@@ -277,6 +318,10 @@ struct CameraScreen: View {
                         .frame(width: DS.captureButton - 18, height: DS.captureButton - 18)
                     if case .capturing = model.phase {
                         ProgressView().tint(DS.background)
+                    } else if case .countdown(let remaining) = model.phase {
+                        Text("\(remaining)")
+                            .readout(28, weight: .bold)
+                            .foregroundStyle(DS.background)
                     }
                 }
             }

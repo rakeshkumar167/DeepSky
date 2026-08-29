@@ -21,10 +21,15 @@ final class CaptureModel {
         case idle
         case preparing
         case ready
+        case countdown(secondsRemaining: Int)
         case capturing(done: Int, total: Int)
         case finished(framesWritten: Int, flagged: Int, interrupted: Bool)
         case failed(String)
     }
+
+    /// Gives the user a moment to steady the phone after tapping the shutter,
+    /// rather than capturing the tap's own jolt as the first frame.
+    static let preCaptureDelaySeconds = 3
 
     private(set) var phase: Phase = .idle
     private(set) var settings: CaptureSettings?
@@ -115,14 +120,21 @@ final class CaptureModel {
         // Focus is the one setting the user controls directly.
         settings.lensPosition = Float(lensPosition)
 
-        phase = .capturing(done: 0, total: requestedFrames)
-
         // iOS revokes camera access the moment the app leaves the foreground,
         // and a locked screen does exactly that — no app can keep shooting
         // through it. So the fix is to stop the screen locking in the first
-        // place, for as long as the session runs and no longer.
+        // place, for as long as the session runs and no longer. Covers the
+        // countdown too, since the user shouldn't have to keep the screen
+        // awake by hand while waiting for capture to start.
         UIApplication.shared.isIdleTimerDisabled = true
         defer { UIApplication.shared.isIdleTimerDisabled = false }
+
+        for remaining in stride(from: Self.preCaptureDelaySeconds, to: 0, by: -1) {
+            phase = .countdown(secondsRemaining: remaining)
+            try? await Task.sleep(for: .seconds(1))
+        }
+
+        phase = .capturing(done: 0, total: requestedFrames)
 
         do {
             let root = URL.documentsDirectory.appendingPathComponent("Sessions")
